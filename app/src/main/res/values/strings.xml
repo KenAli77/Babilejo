@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">Babilejo</string>
+    <string name="email">email</string>
+    <string name="password">password</string>
+    <string name="password_recover">forgot password?</string>
+    <string name="login">login</string>
+    <string name="or">or</string>
+    <string name="google_login">continue with google</string>
+    <string name="sign_up">create account</string>
+    <string name="home_screen">home_screen</string>
+    <string name="login_screen">login_screen</string>
+    <string name="signup_screen">signup_screen</string>
+    <string name="home">home</string>
+    <string name="signup">Sign up</string>
+</resources>
