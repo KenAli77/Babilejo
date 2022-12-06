@@ -25,7 +25,6 @@ sealed class Screens(
     object Login : Screens(route = "login_screen", title = R.string.login)
     object Signup : Screens(route = "signup_screen", title = R.string.signup)
 
-   // object Workout : Screens(route = "workout_screen", title = R.string.workout)
 //  //  object Stats :
 //        Screens(route = "stats_screen", title = R.string.stats, icon = Icons.Rounded.Analytics)
 //

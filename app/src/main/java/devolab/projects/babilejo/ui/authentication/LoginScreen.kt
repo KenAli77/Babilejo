@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import devolab.projects.babilejo.R
 import devolab.projects.babilejo.ui.navigation.Screens
 import devolab.projects.babilejo.ui.theme.Blue
@@ -40,7 +41,7 @@ import devolab.projects.babilejo.ui.viewmodel.UserAuthViewModel
 fun LoginScreen(
     viewModel: UserAuthViewModel, navController: NavHostController = rememberNavController(
     ),
-    scaffoldState: ScaffoldState = rememberScaffoldState()
+    scaffoldState: ScaffoldState = rememberScaffoldState(),
 ) {
 
     val state = viewModel.loginState
@@ -141,7 +142,8 @@ fun LoginScreen(
                 GoogleAuthButton(
                     text = stringResource(R.string.google_login),
                     modifier = Modifier.fillMaxWidth(),
-                    textColor = Color.DarkGray.copy(0.5f)
+                    textColor = Color.DarkGray.copy(0.5f),
+                    onClick = { viewModel.googleLogin() }
                 )
                 Spacer(modifier = Modifier.height(10.dp))
                 SignUpRow(onClick = {navController.navigate(Screens.Signup.route)})

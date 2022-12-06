@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import devolab.projects.babilejo.R
+import devolab.projects.babilejo.ui.navigation.MAIN_ROUTE
 import devolab.projects.babilejo.ui.theme.Blue
 import devolab.projects.babilejo.ui.theme.Yellow
 import devolab.projects.babilejo.ui.theme.quicksand
@@ -34,6 +35,7 @@ fun SignUpScreen(
 ) {
 
     val state = viewModel.signUpState
+    val googleLogin = viewModel.loginState
     var userName by remember { mutableStateOf("") }
     var eMail by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -56,11 +58,13 @@ fun SignUpScreen(
         }
 
     }
-    LaunchedEffect(key1 = state.success) {
-        if (state.success) {
-            // navController.navigate(MAIN_ROUTE)
+    LaunchedEffect(key1 = state.success,key2 = googleLogin  ) {
+        if (state.success || googleLogin.success) {
+            navController.navigate(MAIN_ROUTE)
             Toast.makeText(context, "account created!", Toast.LENGTH_LONG).show()
         }
+
+
     }
     Surface(color = Yellow.copy(0.1f), modifier = Modifier.fillMaxSize()) {
 
@@ -147,7 +151,8 @@ fun SignUpScreen(
                 GoogleAuthButton(
                     text = stringResource(R.string.google_login),
                     modifier = Modifier.fillMaxWidth(),
-                    textColor = Color.DarkGray.copy(0.5f)
+                    textColor = Color.DarkGray.copy(0.5f),
+                    onClick = {viewModel.googleLogin()}
                 )
 
                 Spacer(modifier = Modifier.height(5.dp))
