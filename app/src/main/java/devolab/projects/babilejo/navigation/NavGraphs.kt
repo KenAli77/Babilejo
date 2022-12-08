@@ -20,8 +20,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navigation
 import devolab.projects.babilejo.ui.authentication.LoginScreen
 import devolab.projects.babilejo.ui.authentication.SignUpScreen
-import devolab.projects.babilejo.ui.main.HomeScreen
-import devolab.projects.babilejo.ui.theme.Yellow
+import devolab.projects.babilejo.ui.home.HomeScreen
 import devolab.projects.babilejo.ui.authentication.UserAuthViewModel
 
 @Composable
@@ -49,7 +48,7 @@ fun RootNavGraph(
                 false -> {}
             }
         },
-        backgroundColor = Yellow,
+
 
         ) {
 

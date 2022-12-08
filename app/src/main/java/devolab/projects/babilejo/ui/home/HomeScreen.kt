@@ -1,4 +1,4 @@
-package devolab.projects.babilejo.ui.main
+package devolab.projects.babilejo.ui.home
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Surface
@@ -16,7 +16,9 @@ import devolab.projects.babilejo.ui.authentication.UserAuthViewModel
 @Composable
 fun HomeScreen(viewModel: UserAuthViewModel, navController: NavHostController){
 
-    Surface(color = Yellow.copy(0.1f), modifier = Modifier.fillMaxSize()) {
+    viewModel.getUserData()
+
+    Surface(color = Color.White, modifier = Modifier.fillMaxSize()) {
 
         Column(
             modifier = Modifier
@@ -26,7 +28,7 @@ fun HomeScreen(viewModel: UserAuthViewModel, navController: NavHostController){
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
 
-            Text(text = "Welcome", color = Color.White, fontSize = 50.sp)
+            Text(text = "Welcome, ${viewModel.userDataState.data?.userName}", color = Color.Black, fontSize = 50.sp)
 
         }
 

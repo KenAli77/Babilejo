@@ -9,17 +9,20 @@ import com.google.android.gms.auth.api.identity.SignInClient
 import com.google.firebase.auth.AuthCredential
 import dagger.hilt.android.lifecycle.HiltViewModel
 import devolab.projects.babilejo.data.repository.UserAuthRepositoryImpl
+import devolab.projects.babilejo.data.repository.UserProfileRepositoryImpl
 import devolab.projects.babilejo.domain.model.Resource
 import devolab.projects.babilejo.util.AuthResponse
 import devolab.projects.babilejo.util.LoginWithGoogleResponse
 import devolab.projects.babilejo.util.OneTapLoginResponse
+import devolab.projects.babilejo.util.UserDataResponse
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class UserAuthViewModel @Inject constructor(
     private val repo: UserAuthRepositoryImpl,
-    val oneTapClient: SignInClient
+    val oneTapClient: SignInClient,
+    private val userProfileRepo:UserProfileRepositoryImpl
 ) : ViewModel() {
 
     var loginState by mutableStateOf<AuthResponse>(Resource.Success(null))
@@ -33,6 +36,8 @@ class UserAuthViewModel @Inject constructor(
 
     var signUpState by mutableStateOf<AuthResponse>(Resource.Success(null))
         private set
+
+    var userDataState by mutableStateOf<UserDataResponse>(Resource.Success(null))
 
     fun logInUser(email: String, password: String) =
         viewModelScope.launch {
@@ -68,6 +73,10 @@ class UserAuthViewModel @Inject constructor(
         signInWithGoogleResponse = repo.firebaseSignInWithGoogle(googleCredential)
     }
 
+    fun getUserData()= viewModelScope.launch {
+        userDataState = Resource.Loading()
+        userDataState = userProfileRepo.getUserData()
+    }
 }
 
 

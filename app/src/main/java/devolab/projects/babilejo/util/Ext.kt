@@ -6,9 +6,8 @@ import devolab.projects.babilejo.domain.model.User
 
 fun FirebaseUser.toUser() = User(
     uid = uid,
-    displayName,
+    displayName = displayName,
     userEmail = email,
     photoUrl = photoUrl?.toString(),
-    created = FieldValue.serverTimestamp()
 )
 

@@ -31,7 +31,7 @@ import devolab.projects.babilejo.navigation.Screens
 import devolab.projects.babilejo.ui.theme.Blue
 import devolab.projects.babilejo.ui.theme.Yellow
 import devolab.projects.babilejo.ui.theme.quicksand
-import devolab.projects.babilejo.ui.authentication.UserAuthViewModel
+import devolab.projects.babilejo.ui.authentication.components.*
 
 
 @Composable
@@ -88,7 +88,7 @@ fun LoginContent(
     var password by remember { mutableStateOf("") }
     val context = LocalContext.current
 
-    Surface(color = Yellow.copy(0.1f), modifier = Modifier.fillMaxSize()) {
+    Surface(color = Yellow, modifier = Modifier.fillMaxSize()) {
 
 
         Column(

@@ -9,7 +9,5 @@ data class User(
     val displayName:String?=null,
     val userEmail:String?=null,
     val photoUrl:String?=null,
-    @ServerTimestamp
-    val created: FieldValue? = null
 
 )

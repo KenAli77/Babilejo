@@ -1,5 +1,6 @@
 package devolab.projects.babilejo.data.repository
 
+import android.util.Log
 import com.google.android.gms.auth.api.identity.SignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.firebase.auth.FirebaseAuth
@@ -28,6 +29,7 @@ class UserProfileRepositoryImpl @Inject constructor(
         return try {
             val user = db.collection(USERS).document(auth.currentUser!!.uid).get().await()
 
+            Log.e("user data",user.toObject<User>()?.userName.toString())
             Resource.Success(user.toObject<User>())
         } catch (e: Exception) {
             e.printStackTrace()

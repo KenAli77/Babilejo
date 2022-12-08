@@ -7,7 +7,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.android.gms.auth.api.identity.BeginSignInResult
 import devolab.projects.babilejo.domain.model.Resource
-import devolab.projects.babilejo.ui.authentication.UserAuthViewModel
+import devolab.projects.babilejo.ui.authentication.components.ProgressBar
 
 @Composable
 fun OneTapSignIn(

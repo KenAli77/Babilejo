@@ -6,7 +6,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import devolab.projects.babilejo.domain.model.Resource
-import devolab.projects.babilejo.ui.authentication.UserAuthViewModel
+import devolab.projects.babilejo.ui.authentication.components.ProgressBar
 
 @Composable
 fun GoogleLogin(

@@ -9,7 +9,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import devolab.projects.babilejo.domain.model.Resource
 import devolab.projects.babilejo.navigation.Screens
-import devolab.projects.babilejo.ui.authentication.UserAuthViewModel
+import devolab.projects.babilejo.ui.authentication.components.ProgressBar
 
 @Composable
 fun EmailLogin(

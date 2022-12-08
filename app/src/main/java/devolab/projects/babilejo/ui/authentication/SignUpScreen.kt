@@ -28,7 +28,7 @@ import devolab.projects.babilejo.R
 import devolab.projects.babilejo.navigation.Screens
 import devolab.projects.babilejo.ui.theme.Blue
 import devolab.projects.babilejo.ui.theme.Yellow
-import devolab.projects.babilejo.ui.authentication.UserAuthViewModel
+import devolab.projects.babilejo.ui.authentication.components.*
 
 @Composable
 fun SignUpScreen(

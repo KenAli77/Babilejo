@@ -1,4 +1,4 @@
-package devolab.projects.babilejo.ui.authentication
+package devolab.projects.babilejo.ui.authentication.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -23,7 +23,6 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.google.android.gms.auth.api.identity.BeginSignInResult
 import devolab.projects.babilejo.R
 import devolab.projects.babilejo.ui.theme.Blue
 import devolab.projects.babilejo.ui.theme.Yellow

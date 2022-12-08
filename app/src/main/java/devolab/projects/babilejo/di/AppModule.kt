@@ -90,8 +90,9 @@ object AppModule {
     @Provides
     @Singleton
     fun providesAuthViewModel(repo: UserAuthRepositoryImpl,
-                              oneTapClient: SignInClient): UserAuthViewModel {
-        return UserAuthViewModel(repo,oneTapClient)
+                              oneTapClient: SignInClient,
+    userProfileRepo: UserProfileRepositoryImpl): UserAuthViewModel {
+        return UserAuthViewModel(repo,oneTapClient, userProfileRepo = userProfileRepo)
     }
 
     @Provides
