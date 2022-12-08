@@ -1,4 +1,4 @@
-package devolab.projects.babilejo.utills
+package devolab.projects.babilejo.util
 
 const val USERS = "users"
 const val SIGN_IN_REQUEST = "SIGN_IN_REQUEST"

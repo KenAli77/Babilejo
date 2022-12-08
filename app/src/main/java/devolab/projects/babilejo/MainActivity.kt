@@ -14,7 +14,6 @@ import devolab.projects.babilejo.ui.theme.BabilejoTheme
 import devolab.projects.babilejo.ui.authentication.UserAuthViewModel
 import javax.inject.Inject
 
-const val REQUEST_ONE_TAP = 0
 
 @AndroidEntryPoint
 class MainActivity: ComponentActivity() {

@@ -8,9 +8,9 @@ import com.google.firebase.firestore.FirebaseFirestore
 import devolab.projects.babilejo.domain.model.Resource
 import devolab.projects.babilejo.domain.repository.UserAuthRepository
 import devolab.projects.babilejo.util.*
-import devolab.projects.babilejo.utills.SIGN_IN_REQUEST
-import devolab.projects.babilejo.utills.SIGN_UP_REQUEST
-import devolab.projects.babilejo.utills.USERS
+import devolab.projects.babilejo.util.SIGN_IN_REQUEST
+import devolab.projects.babilejo.util.SIGN_UP_REQUEST
+import devolab.projects.babilejo.util.USERS
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import javax.inject.Named
@@ -92,6 +92,7 @@ class UserAuthRepositoryImpl @Inject constructor(
             Resource.Error(e.message.toString())
         }
     }
+
     private suspend fun addUserToFirestore() {
         auth.currentUser?.apply {
             val user = toUser()

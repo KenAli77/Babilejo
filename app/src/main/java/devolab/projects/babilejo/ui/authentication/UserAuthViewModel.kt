@@ -18,13 +18,15 @@ import javax.inject.Inject
 
 @HiltViewModel
 class UserAuthViewModel @Inject constructor(
-    val repo: UserAuthRepositoryImpl,
+    private val repo: UserAuthRepositoryImpl,
     val oneTapClient: SignInClient
 ) : ViewModel() {
 
     var loginState by mutableStateOf<AuthResponse>(Resource.Success(null))
+        private set
 
     var googleLoginState by mutableStateOf<OneTapLoginResponse>(Resource.Success(null))
+        private set
 
     var signInWithGoogleResponse by mutableStateOf<LoginWithGoogleResponse>(Resource.Success(false))
         private set

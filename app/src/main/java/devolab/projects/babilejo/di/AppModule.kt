@@ -24,8 +24,8 @@ import devolab.projects.babilejo.data.repository.UserProfileRepositoryImpl
 import devolab.projects.babilejo.domain.repository.UserAuthRepository
 import devolab.projects.babilejo.domain.repository.UserProfileRepository
 import devolab.projects.babilejo.ui.authentication.UserAuthViewModel
-import devolab.projects.babilejo.utills.SIGN_IN_REQUEST
-import devolab.projects.babilejo.utills.SIGN_UP_REQUEST
+import devolab.projects.babilejo.util.SIGN_IN_REQUEST
+import devolab.projects.babilejo.util.SIGN_UP_REQUEST
 import javax.inject.Named
 import javax.inject.Singleton
 

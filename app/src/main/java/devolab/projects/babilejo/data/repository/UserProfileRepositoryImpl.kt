@@ -9,7 +9,7 @@ import devolab.projects.babilejo.domain.model.User
 import devolab.projects.babilejo.domain.repository.UserProfileRepository
 import devolab.projects.babilejo.domain.model.Resource
 import devolab.projects.babilejo.util.*
-import devolab.projects.babilejo.utills.USERS
+import devolab.projects.babilejo.util.USERS
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
