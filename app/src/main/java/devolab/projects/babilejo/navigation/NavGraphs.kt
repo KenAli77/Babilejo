@@ -1,4 +1,4 @@
-package devolab.projects.babilejo.ui.navigation
+package devolab.projects.babilejo.navigation
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -20,20 +20,18 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navigation
 import devolab.projects.babilejo.ui.authentication.LoginScreen
 import devolab.projects.babilejo.ui.authentication.SignUpScreen
+import devolab.projects.babilejo.ui.main.HomeScreen
 import devolab.projects.babilejo.ui.theme.Yellow
-import devolab.projects.babilejo.ui.viewmodel.UserAuthViewModel
+import devolab.projects.babilejo.ui.authentication.UserAuthViewModel
 
 @Composable
 fun RootNavGraph(
     navController: NavHostController,
     userViewModel: UserAuthViewModel = viewModel(),
-    // workoutViewModel: WorkoutViewModel = viewModel(),
 ) {
 
     val bottomBarState = rememberSaveable { (mutableStateOf(false)) }
     val scaffoldState = rememberScaffoldState()
-
-
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
 
@@ -67,7 +65,8 @@ fun RootNavGraph(
                 navController = navController,
                 bottomBarState,
                 userViewModel,
-                scaffoldState
+                scaffoldState,
+
             )
 
             mainNavGraph(
@@ -86,16 +85,18 @@ fun NavGraphBuilder.loginNavGraph(
     navController: NavHostController,
     bottomBarState: MutableState<Boolean>,
     userViewModel: UserAuthViewModel,
-    scaffoldState: ScaffoldState
+    scaffoldState: ScaffoldState,
 ) {
 
     navigation(startDestination = Screens.Login.route, route = LOGIN_ROUTE)
     {
+
+
         composable(route = Screens.Login.route) {
             LoginScreen(
                 navController = navController,
                 viewModel = userViewModel,
-                scaffoldState = scaffoldState
+
             )
             bottomBarState.value = false
         }
@@ -103,7 +104,7 @@ fun NavGraphBuilder.loginNavGraph(
             SignUpScreen(
                 navController = navController,
                 viewModel = userViewModel,
-                scaffoldState = scaffoldState
+                scaffoldState = scaffoldState,
             )
             bottomBarState.value = false
         }
@@ -114,7 +115,6 @@ fun NavGraphBuilder.mainNavGraph(
     navController: NavHostController,
     bottomBarState: MutableState<Boolean>,
     userViewModel: UserAuthViewModel,
-    // workoutViewModel: WorkoutViewModel,
     scaffoldState: ScaffoldState
 ) {
 
@@ -124,7 +124,7 @@ fun NavGraphBuilder.mainNavGraph(
         composable(
             route = Screens.Home.route
         ) {
-            //HomeScreen(navController, userViewModel, scaffoldState)
+            HomeScreen( userViewModel,navController)
             bottomBarState.value = true
         }
 

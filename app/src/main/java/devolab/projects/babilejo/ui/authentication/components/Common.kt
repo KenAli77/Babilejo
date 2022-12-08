@@ -23,6 +23,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.google.android.gms.auth.api.identity.BeginSignInResult
 import devolab.projects.babilejo.R
 import devolab.projects.babilejo.ui.theme.Blue
 import devolab.projects.babilejo.ui.theme.Yellow
@@ -157,7 +158,6 @@ fun GoogleAuthButton(
     onClick: () -> Unit = {},
 ) {
 
-
     Surface(
         color = backgroundColor,
         shape = RoundedCornerShape(10.dp),
@@ -265,5 +265,15 @@ fun TermsAndCo(
         }
 
 
+    }
+}
+
+@Composable
+fun ProgressBar() {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ){
+        CircularProgressIndicator()
     }
 }

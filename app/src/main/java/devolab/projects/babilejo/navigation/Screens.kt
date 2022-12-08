@@ -1,4 +1,4 @@
-package devolab.projects.babilejo.ui.navigation
+package devolab.projects.babilejo.navigation
 
 import androidx.annotation.StringRes
 import androidx.compose.material.icons.Icons

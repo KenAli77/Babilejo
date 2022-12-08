@@ -1,4 +1,4 @@
-package devolab.projects.babilejo.ui.navigation
+package devolab.projects.babilejo.navigation
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
