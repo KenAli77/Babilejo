@@ -27,7 +27,9 @@ import com.google.android.gms.auth.api.identity.BeginSignInResult
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.GoogleAuthProvider
 import devolab.projects.babilejo.R
-import devolab.projects.babilejo.navigation.Screens
+import devolab.projects.babilejo.navigation.AuthScreens
+import devolab.projects.babilejo.navigation.BottomBarScreens
+import devolab.projects.babilejo.navigation.Graph
 import devolab.projects.babilejo.ui.theme.Blue
 import devolab.projects.babilejo.ui.theme.Yellow
 import devolab.projects.babilejo.ui.theme.quicksand
@@ -69,7 +71,7 @@ fun LoginScreen(
     GoogleLogin(
         navigateToHomeScreen = { signedIn ->
             if (signedIn) {
-                navController.navigate(Screens.Home.route)
+                navController.navigate(Graph.MAIN_ROUTE)
             }
         }
     )
@@ -166,7 +168,7 @@ fun LoginContent(
                 onClick = { viewModel.oneTapSignIn() },
             )
             Spacer(modifier = Modifier.height(10.dp))
-            SignUpRow(onClick = { navController.navigate(Screens.Signup.route) })
+            SignUpRow(onClick = { navController.navigate(AuthScreens.Signup.route) })
 
         }
 

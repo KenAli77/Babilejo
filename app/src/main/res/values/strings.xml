@@ -13,4 +13,6 @@
     <string name="home">home</string>
     <string name="signup">Sign up</string>
     <string name="webclient_id">483791181430-t9e7o79eqqqll65c5qdbalr0rg5bpgks.apps.googleusercontent.com</string>
+    <string name="explore">explore</string>
+    <string name="messages">messages</string>
 </resources>

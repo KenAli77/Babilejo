@@ -8,7 +8,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import devolab.projects.babilejo.domain.model.Resource
-import devolab.projects.babilejo.navigation.Screens
+import devolab.projects.babilejo.navigation.BottomBarScreens
 import devolab.projects.babilejo.ui.authentication.components.ProgressBar
 
 @Composable
@@ -21,7 +21,7 @@ fun EmailLogin(
         is Resource.Loading -> ProgressBar()
         is Resource.Success -> authResponse.data?.let {
             LaunchedEffect(it) {
-                navController.navigate(Screens.Home.route)
+                navController.navigate(BottomBarScreens.Home.route)
             }
         }
         is Resource.Error -> LaunchedEffect(Unit) {

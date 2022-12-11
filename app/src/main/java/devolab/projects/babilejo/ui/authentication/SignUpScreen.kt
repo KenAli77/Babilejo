@@ -25,7 +25,7 @@ import com.google.android.gms.auth.api.identity.BeginSignInResult
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.GoogleAuthProvider
 import devolab.projects.babilejo.R
-import devolab.projects.babilejo.navigation.Screens
+import devolab.projects.babilejo.navigation.BottomBarScreens
 import devolab.projects.babilejo.ui.theme.Blue
 import devolab.projects.babilejo.ui.theme.Yellow
 import devolab.projects.babilejo.ui.authentication.components.*
@@ -148,7 +148,7 @@ fun SignUpScreen(
     GoogleLogin(
         navigateToHomeScreen = { signedIn ->
             if (signedIn) {
-                navController.navigate(Screens.Home.route)
+                navController.navigate(BottomBarScreens.Home.route)
             }
         }
     )

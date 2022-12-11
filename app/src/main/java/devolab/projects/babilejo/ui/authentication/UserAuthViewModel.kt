@@ -46,6 +46,9 @@ class UserAuthViewModel @Inject constructor(
 
         }
 
+    fun isUserAuthenticated():Boolean {
+        return repo.isUserAuthenticatedInFirebase
+    }
 
     fun createUser(
         email: String,

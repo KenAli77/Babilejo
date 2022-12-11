@@ -26,53 +26,48 @@ import devolab.projects.babilejo.ui.theme.Yellow
 
 @Composable
 fun BottomNavBar(
-    navController: NavHostController = rememberNavController(),
-    bottomBarState: MutableState<Boolean>
+    navController: NavHostController ,
 ) {
     val screens = listOf(
-        Screens.Home,
-//        Screens.Stats,
-//        Screens.Profile,
-//        Screens.Exercises
+        BottomBarScreens.Home,
+        BottomBarScreens.Explore,
+        BottomBarScreens.Messages,
+
     )
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
 
-    AnimatedVisibility(
-        visible = bottomBarState.value, enter = slideInVertically(initialOffsetY = { it }),
-        exit = slideOutVertically(targetOffsetY = { it }),
-    ) {
-        BottomNavigation(
-            modifier = Modifier
-                .graphicsLayer {
-                    clip = true
-                    shape = RoundedCornerShape(topStart = 40.dp, topEnd = 40.dp)
-                }
-                .height(70.dp),
-            elevation = 10.dp,
-            backgroundColor = Yellow,
-
-
-            ) {
-
-            screens.forEach {
-
-                this@BottomNavigation.AddItem(
-                    screens = it,
-                    currentDestination = currentDestination,
-                    navController = navController
-                )
+    BottomNavigation(
+        modifier = Modifier
+            .graphicsLayer {
+                clip = true
+                shape = RoundedCornerShape(topStart = 40.dp, topEnd = 40.dp)
             }
+            .height(70.dp),
+        elevation = 10.dp,
+        backgroundColor = Yellow,
 
 
+        ) {
+
+        screens.forEach {
+
+            this@BottomNavigation.AddItem(
+                screens = it,
+                currentDestination = currentDestination,
+                navController = navController
+            )
         }
+
+
     }
+
 
 }
 
 @Composable
 fun RowScope.AddItem(
-    screens: Screens,
+    screens: BottomBarScreens,
     currentDestination: NavDestination?,
     navController: NavHostController
 ) {
