@@ -9,9 +9,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import devolab.projects.babilejo.data.location.DefaultLocationTracker
+import devolab.projects.babilejo.domain.model.Resource
 import devolab.projects.babilejo.domain.repository.UserProfileRepository
+import devolab.projects.babilejo.util.LocationResponse
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -21,7 +24,7 @@ class ExploreViewModel @Inject constructor(
     private val userProfileRepository: UserProfileRepository
 ) : ViewModel() {
 
-    var currentPosition by mutableStateOf(Location(""))
+    var currentPosition by mutableStateOf<Resource<Location>>(Resource.Loading())
         private set
 
     var lastKnownPosition by mutableStateOf(Location(""))
@@ -31,12 +34,25 @@ class ExploreViewModel @Inject constructor(
         viewModelScope.launch {
             getPositionUpdates()
             getLastKnownPosition()
+
         }
     }
 
     private fun getPositionUpdates() = viewModelScope.launch {
-        locationTracker.getLocationUpdates().collect {
-            currentPosition = it
+        locationTracker.getLocationUpdates().collect { result ->
+
+            currentPosition = when(result){
+                is Resource.Error -> {
+                    Resource.Error(result.message.toString())
+                }
+                is Resource.Loading -> {
+                    Resource.Loading()
+                }
+                is Resource.Success -> {
+                    Resource.Success(result.data)
+                }
+            }
+
         }
 
     }

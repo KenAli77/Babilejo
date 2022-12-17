@@ -1,4 +1,4 @@
-package devolab.projects.babilejo.ui.authentication
+package devolab.projects.babilejo.ui.authentication.components
 
 import android.widget.Toast
 import androidx.compose.runtime.Composable
@@ -9,7 +9,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import devolab.projects.babilejo.domain.model.Resource
 import devolab.projects.babilejo.navigation.BottomBarScreens
-import devolab.projects.babilejo.ui.authentication.components.ProgressBar
+import devolab.projects.babilejo.ui.authentication.UserAuthViewModel
 
 @Composable
 fun EmailLogin(

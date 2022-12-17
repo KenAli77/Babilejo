@@ -28,7 +28,6 @@ import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.GoogleAuthProvider
 import devolab.projects.babilejo.R
 import devolab.projects.babilejo.navigation.AuthScreens
-import devolab.projects.babilejo.navigation.BottomBarScreens
 import devolab.projects.babilejo.navigation.Graph
 import devolab.projects.babilejo.ui.theme.Blue
 import devolab.projects.babilejo.ui.theme.Yellow

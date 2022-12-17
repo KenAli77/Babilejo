@@ -64,6 +64,10 @@ dependencies {
     implementation 'androidx.activity:activity-compose:1.6.1'
     implementation "androidx.compose.material:material-icons-extended:$compose_version"
 
+    implementation "androidx.compose.runtime:runtime:1.3.2"
+    implementation "androidx.compose.runtime:runtime-livedata:1.3.2"
+
+
     // Maps SDK Google
     implementation 'com.google.maps.android:maps-compose:2.7.2'
     implementation 'com.google.android.gms:play-services-maps:18.1.0'

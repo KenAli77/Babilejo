@@ -17,6 +17,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -30,6 +31,7 @@ import devolab.projects.babilejo.navigation.Graph.MAIN_ROUTE
 import devolab.projects.babilejo.ui.authentication.UserAuthViewModel
 import devolab.projects.babilejo.ui.main.MainScreen
 import devolab.projects.babilejo.ui.main.explore.ExploreScreen
+import devolab.projects.babilejo.ui.main.explore.ExploreViewModel
 import devolab.projects.babilejo.ui.main.home.HomeScreen
 import devolab.projects.babilejo.ui.main.messages.MessagesScreen
 import kotlinx.coroutines.launch
@@ -39,6 +41,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun MainNavGraph(
     navController: NavHostController = rememberNavController(),
+    exploreViewModel: ExploreViewModel,
+
 ) {
 
     val coroutineScope = rememberCoroutineScope()
@@ -76,7 +80,7 @@ fun MainNavGraph(
         }
 
         composable(BottomBarScreens.Explore.route) {
-            ExploreScreen(navController)
+            ExploreScreen(navController,exploreViewModel)
         }
         composable(BottomBarScreens.Messages.route) {
             MessagesScreen(navController)

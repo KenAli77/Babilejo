@@ -1,4 +1,4 @@
-package devolab.projects.babilejo.ui.authentication
+package devolab.projects.babilejo.ui.authentication.components
 
 import android.widget.Toast
 import androidx.compose.runtime.Composable
@@ -6,7 +6,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import devolab.projects.babilejo.domain.model.Resource
-import devolab.projects.babilejo.ui.authentication.components.ProgressBar
+import devolab.projects.babilejo.ui.authentication.UserAuthViewModel
 
 @Composable
 fun GoogleLogin(

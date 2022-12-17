@@ -2,6 +2,7 @@ package devolab.projects.babilejo.ui.main.home.components
 
 import android.annotation.SuppressLint
 import android.location.Location
+import android.util.Log
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -20,10 +21,11 @@ import kotlinx.coroutines.launch
 @SuppressLint("RememberReturnType")
 @Composable
 fun MainMapView(currentLocation: Location, lastKnownLocation: Location) {
+    Log.e("location","${lastKnownLocation.latitude} ${lastKnownLocation.longitude}")
     val positionState = rememberCameraPositionState(
         init = {
             CameraPosition(
-                LatLng(lastKnownLocation.latitude, lastKnownLocation.longitude),
+                LatLng(currentLocation.latitude, currentLocation.longitude),
                 14f,
                 0f,
                 0f
@@ -33,6 +35,7 @@ fun MainMapView(currentLocation: Location, lastKnownLocation: Location) {
 
     val scope = rememberCoroutineScope()
 
+    val mapLoaded = remember{ mutableStateOf(false) }
 
     GoogleMap(
         modifier = Modifier.fillMaxSize(),
@@ -41,18 +44,19 @@ fun MainMapView(currentLocation: Location, lastKnownLocation: Location) {
         cameraPositionState = positionState,
         onMapLoaded = {
             scope.launch {
-                positionState.animate(
-                    update = CameraUpdateFactory.newCameraPosition(
-                        CameraPosition(
-                            LatLng(currentLocation.latitude, currentLocation.longitude),
-                            14.0f,
-                            0f,
-                            0f
+                    positionState.animate(
+                        update = CameraUpdateFactory.newCameraPosition(
+                            CameraPosition(
+                                LatLng(currentLocation.latitude, currentLocation.longitude),
+                                14.0f,
+                                0f,
+                                0f
+                            )
                         )
                     )
-                )
             }
-        }
+        },
+
 
     ) {
 

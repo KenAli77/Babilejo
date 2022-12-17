@@ -15,13 +15,14 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.Priority
 import devolab.projects.babilejo.domain.location.LocationTracker
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import devolab.projects.babilejo.domain.model.Resource
+import devolab.projects.babilejo.util.LocationResponse
+import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.coroutines.resume
 
@@ -29,9 +30,9 @@ class DefaultLocationTracker @Inject constructor(
     private val fusedLocationProviderClient: FusedLocationProviderClient,
     private val application: Application
 
-):LocationTracker {
+) : LocationTracker {
 
-    companion object{
+    companion object {
         const val TAG = "DefaultLocationTracker"
     }
 
@@ -39,8 +40,10 @@ class DefaultLocationTracker @Inject constructor(
         application.getSystemService(Context.LOCATION_SERVICE) as LocationManager
 
     private val isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+    private val isNetworkEnabled =
+        locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
 
-    private lateinit var locationRequest:LocationRequest
+    private lateinit var locationRequest: LocationRequest
     private var location: Location? = null
 
 
@@ -81,53 +84,56 @@ class DefaultLocationTracker @Inject constructor(
                 }
                 addOnCanceledListener {
                     cont.cancel()
-                    Log.e("cancelled","Location fetch cancelled")
+                    Log.e("cancelled", "Location fetch cancelled")
                 }
             }
 
         }
     }
 
-    override suspend fun getLocationUpdates(): Flow<Location> = flow {
+    override suspend fun getLocationUpdates(): LocationResponse = callbackFlow {
 
-            while (true) {
+        val hasPermissionCoarseLocation = ContextCompat.checkSelfPermission(
+            application, Manifest.permission.ACCESS_COARSE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+        val hasPermissionFineLocation = ContextCompat.checkSelfPermission(
+            application, Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
 
-                val hasPermissionCoarseLocation = ContextCompat.checkSelfPermission(
-                    application, Manifest.permission.ACCESS_COARSE_LOCATION
-                ) == PackageManager.PERMISSION_GRANTED
-                val hasPermissionFineLocation = ContextCompat.checkSelfPermission(
-                    application, Manifest.permission.ACCESS_FINE_LOCATION
-                ) == PackageManager.PERMISSION_GRANTED
+        if (hasPermissionCoarseLocation && hasPermissionFineLocation && (isGpsEnabled || isNetworkEnabled)) {
 
-                if (hasPermissionCoarseLocation && hasPermissionFineLocation) {
+            locationRequest = LocationRequest.Builder(
+                Priority.PRIORITY_HIGH_ACCURACY,
+                1000,
+            ).build()
 
-                    locationRequest = LocationRequest.Builder(
-                        Priority.PRIORITY_HIGH_ACCURACY,
-                        1000,
-                    ).build()
-
-                    fusedLocationProviderClient.requestLocationUpdates(
-                        locationRequest,
-                        object : LocationCallback() {
-                            override fun onLocationResult(result: LocationResult) {
-                                super.onLocationResult(result)
-                                // Update the user's location
-                                result.lastLocation?.let {
-                                    location = it
-
-                                }
-
-                            }
-                        },
-                        Looper.getMainLooper()
-                    ).addOnFailureListener {
-                        Log.e(TAG, it.message.toString())
+            val locationCallback = object : LocationCallback() {
+                override fun onLocationResult(result: LocationResult) {
+                    super.onLocationResult(result)
+                    // Update the user's location
+                    result.locations.lastOrNull()?.let { location ->
+                        launch { send(Resource.Success(location)) }
                     }
 
-                    location?.let {
-                        emit(it)
-                    }
                 }
             }
-    }.flowOn(Dispatchers.IO)
+
+            fusedLocationProviderClient.requestLocationUpdates(
+                locationRequest,
+                locationCallback,
+                Looper.getMainLooper()
+            ).addOnFailureListener {
+                launch { send(Resource.Error(it.message.toString())) }
+            }
+
+            awaitClose{
+                fusedLocationProviderClient.removeLocationUpdates(locationCallback)
+            }
+
+
+        } else {
+            send(Resource.Error("permissions not granted"))
+        }
+
+    }
 }
