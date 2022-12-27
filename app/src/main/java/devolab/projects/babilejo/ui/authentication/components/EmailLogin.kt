@@ -45,5 +45,6 @@ fun EmailLogin(
             print(authResponse.message.toString())
             Toast.makeText(context,authResponse.message, Toast.LENGTH_LONG).show()
         }
+
     }
 }
