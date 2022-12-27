@@ -1,5 +1,6 @@
 package devolab.projects.babilejo.ui.authentication.components
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -269,10 +270,14 @@ fun TermsAndCo(
 
 @Composable
 fun ProgressBar() {
+    Log.e("ProgressBar","Composing")
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ){
         CircularProgressIndicator(color = Yellow)
     }
+
+    Log.e("ProgressBar","Composed")
+
 }

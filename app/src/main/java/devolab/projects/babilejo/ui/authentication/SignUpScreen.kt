@@ -1,6 +1,7 @@
 package devolab.projects.babilejo.ui.authentication
 
 import android.app.Activity
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -25,7 +26,8 @@ import com.google.android.gms.auth.api.identity.BeginSignInResult
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.GoogleAuthProvider
 import devolab.projects.babilejo.R
-import devolab.projects.babilejo.navigation.BottomBarScreens
+import devolab.projects.babilejo.domain.model.Resource
+import devolab.projects.babilejo.navigation.Screens
 import devolab.projects.babilejo.ui.theme.Blue
 import devolab.projects.babilejo.ui.theme.Yellow
 import devolab.projects.babilejo.ui.authentication.components.*
@@ -49,20 +51,20 @@ fun SignUpScreen(
 
 
 
-    Surface(color = Yellow.copy(0.1f), modifier = Modifier.fillMaxSize()) {
+    Surface(color = Yellow, modifier = Modifier.fillMaxSize()) {
 
+        if (state is Resource.Loading) {
+            Column(
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
 
-        Column(
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
-
-            ) {
-            CircularProgressIndicator(
-                color = Yellow,
-                strokeWidth = 5.dp,
-            )
+                ) {
+                CircularProgressIndicator(
+                    color = Yellow,
+                    strokeWidth = 5.dp,
+                )
+            }
         }
-
 
         Column(
             modifier = Modifier
@@ -119,6 +121,25 @@ fun SignUpScreen(
                     )
                     password = ""
                     confirmPassword = ""
+                    when (viewModel.signUpState) {
+                        is Resource.Error -> {
+                            Toast.makeText(
+                                context,
+                                viewModel.signUpState.message.toString(),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                        is Resource.Loading -> {
+
+                            Toast.makeText(context, "loading..", Toast.LENGTH_SHORT).show()
+                        }
+                        is Resource.Success -> {
+
+                            Toast.makeText(context, "account created!", Toast.LENGTH_SHORT).show()
+                            navController.navigate(Screens.Login.route)
+
+                        }
+                    }
 
                 },
                 backgroundColor = Blue
@@ -148,7 +169,7 @@ fun SignUpScreen(
     GoogleLogin(
         navigateToHomeScreen = { signedIn ->
             if (signedIn) {
-                navController.navigate(BottomBarScreens.Home.route)
+                navController.navigate(Screens.Home.route)
             }
         }
     )

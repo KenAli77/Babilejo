@@ -5,6 +5,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
+import devolab.projects.babilejo.navigation.Graph.AUTH_ROUTE
 import devolab.projects.babilejo.ui.authentication.LoginScreen
 import devolab.projects.babilejo.ui.authentication.SignUpScreen
 import devolab.projects.babilejo.ui.authentication.UserAuthViewModel
@@ -14,18 +15,18 @@ fun NavGraphBuilder.authNavGraph(
     userViewModel: UserAuthViewModel,
 ) {
 
-    navigation(startDestination = AuthScreens.Login.route, route = Graph.AUTH_ROUTE)
+    navigation(startDestination = Screens.Login.route, route = AUTH_ROUTE)
     {
 
 
-        composable(route = AuthScreens.Login.route) {
+        composable(route = Screens.Login.route) {
             LoginScreen(
                 navController = navController,
                 viewModel = userViewModel,
 
                 )
         }
-        composable(route = AuthScreens.Signup.route) {
+        composable(route = Screens.Signup.route) {
             SignUpScreen(
                 navController = navController,
                 viewModel = userViewModel,

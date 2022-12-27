@@ -27,7 +27,8 @@ import com.google.android.gms.auth.api.identity.BeginSignInResult
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.GoogleAuthProvider
 import devolab.projects.babilejo.R
-import devolab.projects.babilejo.navigation.AuthScreens
+import devolab.projects.babilejo.domain.model.Resource
+import devolab.projects.babilejo.navigation.Screens
 import devolab.projects.babilejo.navigation.Graph
 import devolab.projects.babilejo.ui.theme.Blue
 import devolab.projects.babilejo.ui.theme.Yellow
@@ -38,9 +39,9 @@ import devolab.projects.babilejo.ui.authentication.components.*
 @Composable
 fun LoginScreen(
     viewModel: UserAuthViewModel,
-    navController: NavHostController = rememberNavController(), ) {
+    navController: NavHostController = rememberNavController(),
+) {
 
-    LoginContent(viewModel = viewModel, navController = navController)
     val launcher =
         rememberLauncherForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
@@ -67,6 +68,7 @@ fun LoginScreen(
         }
     )
 
+
     GoogleLogin(
         navigateToHomeScreen = { signedIn ->
             if (signedIn) {
@@ -75,7 +77,13 @@ fun LoginScreen(
         }
     )
 
-    EmailLogin(navController= navController, viewModel = viewModel)
+    EmailLogin(
+        navigateHome = { navController.navigate(Screens.Home.route) },
+        viewModel = viewModel
+    )
+
+    LoginContent(viewModel = viewModel, navController = navController)
+
 
 }
 
@@ -92,16 +100,9 @@ fun LoginContent(
     Surface(color = Yellow, modifier = Modifier.fillMaxSize()) {
 
 
-        Column(
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
-
-            ) {
-            CircularProgressIndicator(
-                color = Yellow,
-                strokeWidth = 5.dp,
-            )
-        }
+       if (viewModel.loginState is Resource.Loading) {
+           ProgressBar()
+       }
 
         Column(
             modifier = Modifier
@@ -150,6 +151,7 @@ fun LoginContent(
                     viewModel.logInUser(email = eMail, password = password)
                     eMail = ""
                     password = ""
+
                 },
                 backgroundColor = Blue
             )
@@ -167,7 +169,7 @@ fun LoginContent(
                 onClick = { viewModel.oneTapSignIn() },
             )
             Spacer(modifier = Modifier.height(10.dp))
-            SignUpRow(onClick = { navController.navigate(AuthScreens.Signup.route) })
+            SignUpRow(onClick = { navController.navigate(Screens.Signup.route) })
 
         }
 

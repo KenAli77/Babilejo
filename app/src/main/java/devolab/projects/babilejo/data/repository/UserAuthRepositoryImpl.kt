@@ -5,6 +5,7 @@ import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.SignInClient
 import com.google.firebase.auth.*
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.ktx.Firebase
 import devolab.projects.babilejo.domain.model.Resource
 import devolab.projects.babilejo.domain.repository.UserAuthRepository
 import devolab.projects.babilejo.util.*
@@ -64,7 +65,7 @@ class UserAuthRepositoryImpl @Inject constructor(
     ): AuthResponse {
         return try {
 
-            if(confirmPassword!==userLoginPassword){
+            if(confirmPassword!=userLoginPassword){
                return Resource.Error("passwords are not matching")
 
             }
@@ -92,6 +93,7 @@ class UserAuthRepositoryImpl @Inject constructor(
             Resource.Error(e.message.toString())
         }
     }
+
 
     private suspend fun addUserToFirestore() {
         auth.currentUser?.apply {

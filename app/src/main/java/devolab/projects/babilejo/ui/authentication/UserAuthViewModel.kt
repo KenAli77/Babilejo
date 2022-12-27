@@ -15,8 +15,10 @@ import devolab.projects.babilejo.util.AuthResponse
 import devolab.projects.babilejo.util.LoginWithGoogleResponse
 import devolab.projects.babilejo.util.OneTapLoginResponse
 import devolab.projects.babilejo.util.UserDataResponse
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.math.sign
 
 @HiltViewModel
 class UserAuthViewModel @Inject constructor(
@@ -25,7 +27,7 @@ class UserAuthViewModel @Inject constructor(
     private val userProfileRepo:UserProfileRepositoryImpl
 ) : ViewModel() {
 
-    var loginState by mutableStateOf<AuthResponse>(Resource.Success(null))
+    var loginState by mutableStateOf<AuthResponse>(Resource.Loading(null))
         private set
 
     var googleLoginState by mutableStateOf<OneTapLoginResponse>(Resource.Success(null))
@@ -37,11 +39,11 @@ class UserAuthViewModel @Inject constructor(
     var signUpState by mutableStateOf<AuthResponse>(Resource.Success(null))
         private set
 
-    var userDataState by mutableStateOf<UserDataResponse>(Resource.Success(null))
 
     fun logInUser(email: String, password: String) =
         viewModelScope.launch {
             loginState = Resource.Loading()
+            delay(3000)
             loginState = repo.emailLogin(email, password)
 
         }
@@ -57,8 +59,8 @@ class UserAuthViewModel @Inject constructor(
         confirmPassword: String
     ) = viewModelScope.launch {
 
-        loginState = Resource.Loading()
-        loginState = repo.emailSignUp(userEmailAddress = email,
+        signUpState = Resource.Loading()
+        signUpState = repo.emailSignUp(userEmailAddress = email,
             userLoginPassword = password,
             userName = userName,
             confirmPassword = confirmPassword)
@@ -76,9 +78,16 @@ class UserAuthViewModel @Inject constructor(
         signInWithGoogleResponse = repo.firebaseSignInWithGoogle(googleCredential)
     }
 
-    fun getUserData()= viewModelScope.launch {
-        userDataState = Resource.Loading()
-        userDataState = userProfileRepo.getUserData()
+    fun logOut() {
+        viewModelScope.launch {
+            oneTapClient.signOut()
+
+        }
+
+        loginState = Resource.Success(null)
+        signUpState = Resource.Success(null)
+        googleLoginState = Resource.Success(null)
+        signInWithGoogleResponse = Resource.Success(false)
     }
 }
 

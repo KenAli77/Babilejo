@@ -102,6 +102,7 @@ object AppModule {
         return UserAuthViewModel(repo, oneTapClient, userProfileRepo = userProfileRepo)
     }
 
+
     @Provides
     @Singleton
     fun provideUserAuthRepository(

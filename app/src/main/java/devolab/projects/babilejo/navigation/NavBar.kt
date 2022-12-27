@@ -1,14 +1,10 @@
 package devolab.projects.babilejo.navigation
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -20,7 +16,6 @@ import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
 import devolab.projects.babilejo.ui.theme.Yellow
 
 
@@ -29,22 +24,17 @@ fun BottomNavBar(
     navController: NavHostController ,
 ) {
     val screens = listOf(
-        BottomBarScreens.Home,
-        BottomBarScreens.Explore,
-        BottomBarScreens.Messages,
+        Screens.Home,
+        Screens.Explore,
+        Screens.Messages,
+        Screens.Profile
 
     )
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
 
     BottomNavigation(
-        modifier = Modifier
-            .graphicsLayer {
-                clip = true
-                shape = RoundedCornerShape(topStart = 40.dp, topEnd = 40.dp)
-            }
-            .height(70.dp),
-        elevation = 10.dp,
+
         backgroundColor = Yellow,
 
 
@@ -67,7 +57,7 @@ fun BottomNavBar(
 
 @Composable
 fun RowScope.AddItem(
-    screens: BottomBarScreens,
+    screens: Screens,
     currentDestination: NavDestination?,
     navController: NavHostController
 ) {

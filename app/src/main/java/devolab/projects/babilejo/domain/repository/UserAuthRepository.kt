@@ -22,5 +22,4 @@ interface UserAuthRepository {
 
     suspend fun emailLogin(email: String, password: String): AuthResponse
 
-
 }
