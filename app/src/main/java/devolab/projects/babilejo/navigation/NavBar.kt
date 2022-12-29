@@ -2,6 +2,8 @@ package devolab.projects.babilejo.navigation
 
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
@@ -25,9 +27,10 @@ fun BottomNavBar(
 ) {
     val screens = listOf(
         Screens.Home,
-        Screens.Explore,
         Screens.Messages,
-        Screens.Profile
+        Screens.Explore,
+        Screens.Profile,
+        Screens.Settings
 
     )
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -36,6 +39,7 @@ fun BottomNavBar(
     BottomNavigation(
 
         backgroundColor = Yellow,
+        modifier = Modifier.height(45.dp)
 
 
         ) {
@@ -63,9 +67,6 @@ fun RowScope.AddItem(
 ) {
 
     BottomNavigationItem(
-        label = {
-            Text(text = stringResource(id = screens.title))
-        },
 
         onClick = {
             navController.navigate(screens.route) {
@@ -73,10 +74,11 @@ fun RowScope.AddItem(
                 launchSingleTop = true
             }
         },
-        icon = { Icon(imageVector = screens.icon!!, contentDescription = null) },
+        icon = { Icon(imageVector = screens.icon!!, contentDescription = null, modifier = Modifier.size(30.dp)) },
         selected = currentDestination?.hierarchy?.any { it.route == screens.route } == true,
         selectedContentColor = Color.White,
         unselectedContentColor = Color.White.copy(ContentAlpha.disabled),
+        modifier = Modifier.padding(2.dp)
 
 
         )

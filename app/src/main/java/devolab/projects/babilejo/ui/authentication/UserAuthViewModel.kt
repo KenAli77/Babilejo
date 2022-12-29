@@ -24,10 +24,10 @@ import kotlin.math.sign
 class UserAuthViewModel @Inject constructor(
     private val repo: UserAuthRepositoryImpl,
     val oneTapClient: SignInClient,
-    private val userProfileRepo:UserProfileRepositoryImpl
+    private val userProfileRepo: UserProfileRepositoryImpl
 ) : ViewModel() {
 
-    var loginState by mutableStateOf<AuthResponse>(Resource.Loading(null))
+    var loginState by mutableStateOf<AuthResponse>(Resource.Success(null))
         private set
 
     var googleLoginState by mutableStateOf<OneTapLoginResponse>(Resource.Success(null))
@@ -43,13 +43,13 @@ class UserAuthViewModel @Inject constructor(
     fun logInUser(email: String, password: String) =
         viewModelScope.launch {
             loginState = Resource.Loading()
-            delay(3000)
+           // delay(3000)
             loginState = repo.emailLogin(email, password)
 
         }
 
-    fun isUserAuthenticated():Boolean {
-        return repo.isUserAuthenticatedInFirebase
+    fun isUserAuthenticated(): Boolean {
+        return repo.isUserAuthenticated()
     }
 
     fun createUser(
@@ -60,10 +60,12 @@ class UserAuthViewModel @Inject constructor(
     ) = viewModelScope.launch {
 
         signUpState = Resource.Loading()
-        signUpState = repo.emailSignUp(userEmailAddress = email,
+        signUpState = repo.emailSignUp(
+            userEmailAddress = email,
             userLoginPassword = password,
             userName = userName,
-            confirmPassword = confirmPassword)
+            confirmPassword = confirmPassword
+        )
 
     }
 
@@ -80,8 +82,7 @@ class UserAuthViewModel @Inject constructor(
 
     fun logOut() {
         viewModelScope.launch {
-            oneTapClient.signOut()
-
+            repo.logOut()
         }
 
         loginState = Resource.Success(null)

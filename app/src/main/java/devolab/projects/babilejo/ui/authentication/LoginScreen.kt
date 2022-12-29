@@ -62,47 +62,11 @@ fun LoginScreen(
         launcher.launch(intent)
     }
 
-    OneTapSignIn(
-        launch = {
-            launch(it)
-        }
-    )
-
-
-    GoogleLogin(
-        navigateToHomeScreen = { signedIn ->
-            if (signedIn) {
-                navController.navigate(Graph.MAIN_ROUTE)
-            }
-        }
-    )
-
-    EmailLogin(
-        navigateHome = { navController.navigate(Screens.Home.route) },
-        viewModel = viewModel
-    )
-
-    LoginContent(viewModel = viewModel, navController = navController)
-
-
-}
-
-@Composable
-fun LoginContent(
-    viewModel: UserAuthViewModel,
-    navController: NavHostController = rememberNavController(
-    ),
-) {
     var eMail by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     val context = LocalContext.current
 
     Surface(color = Yellow, modifier = Modifier.fillMaxSize()) {
-
-
-       if (viewModel.loginState is Resource.Loading) {
-           ProgressBar()
-       }
 
         Column(
             modifier = Modifier
@@ -113,6 +77,8 @@ fun LoginContent(
         ) {
 
             Logo(modifier = Modifier.align(Start))
+
+
             Spacer(modifier = Modifier.height(80.dp))
 
             InputField(
@@ -171,11 +137,32 @@ fun LoginContent(
             Spacer(modifier = Modifier.height(10.dp))
             SignUpRow(onClick = { navController.navigate(Screens.Signup.route) })
 
+
         }
 
+
+        EmailLogin(
+            navigateHome = { navController.navigate(Screens.Home.route) },
+            viewModel = viewModel
+        )
+        OneTapSignIn(
+            launch = {
+                launch(it)
+            }
+        )
+
+
+        GoogleLogin(
+            navigateToHomeScreen = { signedIn ->
+                if (signedIn) {
+                    navController.navigate(Graph.MAIN_ROUTE)
+                }
+            }
+        )
 
     }
 
 }
+
 
 

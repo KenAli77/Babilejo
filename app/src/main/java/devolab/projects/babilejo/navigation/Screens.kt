@@ -2,10 +2,7 @@ package devolab.projects.babilejo.navigation
 
 import androidx.annotation.StringRes
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Explore
-import androidx.compose.material.icons.rounded.Home
-import androidx.compose.material.icons.rounded.Message
-import androidx.compose.material.icons.rounded.Person
+import androidx.compose.material.icons.rounded.*
 import androidx.compose.ui.graphics.vector.ImageVector
 import devolab.projects.babilejo.R
 
@@ -30,6 +27,7 @@ sealed class Screens(
     object Explore : Screens(route = "explore_screen", title = R.string.explore, icon = Icons.Rounded.Explore)
     object Messages : Screens(route = "messages_screen", title = R.string.messages, icon = Icons.Rounded.Message)
     object Profile : Screens(route = "profile_screen", title = R.string.profile, icon = Icons.Rounded.Person)
+    object Settings : Screens(route = "settings_screen", title = R.string.settings, icon = Icons.Rounded.Settings)
 
 
 

@@ -1,6 +1,5 @@
 package devolab.projects.babilejo.ui.authentication.components
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -16,12 +15,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import devolab.projects.babilejo.R
@@ -38,49 +39,60 @@ fun InputField(
     type: KeyboardType = KeyboardType.Email,
     password: Boolean = false
 ) {
-
-    TextField(
-        value = input,
-        onValueChange = onValueChange,
-        leadingIcon = {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-
-                )
-
-        },
-        colors = TextFieldDefaults.textFieldColors(
-            backgroundColor = Color.White,
-            textColor = Color.Black
-        ),
-        label = { Text(text = placeholder, color = Color.DarkGray.copy(0.3f)) },
+    Row(
         modifier = Modifier.fillMaxWidth(),
-        maxLines = 1,
-        keyboardOptions = KeyboardOptions(
-            keyboardType = type,
-            imeAction = ImeAction.Done
-        ),
-        visualTransformation = if (password) PasswordVisualTransformation() else {
-            VisualTransformation.None
-        }
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    ) {
 
-    )
+        TextField(
+            value = input,
+            onValueChange = onValueChange,
+            leadingIcon = {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+
+                    )
+
+            },
+            colors = TextFieldDefaults.textFieldColors(
+                backgroundColor = Color.White,
+                textColor = Color.Black
+            ),
+            label = { Text(text = placeholder, color = Color.DarkGray.copy(0.3f)) },
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(max = 60.dp),
+            maxLines = 1,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = type,
+                imeAction = ImeAction.Done
+            ),
+            visualTransformation = if (password) PasswordVisualTransformation() else {
+                VisualTransformation.None
+            },
+
+
+            )
+    }
 
 }
 
 @Preview
 @Composable
-fun Logo(modifier: Modifier = Modifier, color: Color = Color.White) {
+fun Logo(modifier: Modifier = Modifier, color: Color = Color.White,fontSize: TextUnit = 60.sp) {
 
-    Text(
-        text = "Babilejo",
-        fontFamily = quicksand,
-        color = color,
-        fontWeight = FontWeight.Bold,
-        fontSize = 60.sp,
-        modifier = modifier
-    )
+    Column(verticalArrangement = Arrangement.Center, modifier = modifier) {
+        Text(
+            text = stringResource(R.string.app_name_logo),
+            fontFamily = quicksand,
+            color = color,
+            fontWeight = FontWeight.Bold,
+            fontSize = fontSize,
+        )
+    }
+
 }
 
 
@@ -93,14 +105,14 @@ fun SignUpRow(modifier: Modifier = Modifier, onClick: () -> Unit = {}) {
     ) {
 
         Text(
-            text = "New here?",
+            text = stringResource(R.string.new_here),
             fontWeight = FontWeight.Normal,
             color = Color.DarkGray.copy(0.5f),
             fontFamily = quicksand
         )
         Spacer(modifier = Modifier.width(5.dp))
         Text(
-            text = "Sign up",
+            text = stringResource(R.string.signup_text),
             fontWeight = FontWeight.Bold,
             color = Color.Black,
             fontFamily = quicksand,
@@ -175,7 +187,7 @@ fun GoogleAuthButton(
         ) {
             Image(
                 painter = painterResource(id = R.drawable.ic_google),
-                contentDescription = "google",
+                contentDescription = stringResource(R.string.google),
                 modifier = Modifier.size(25.dp)
 
             )
@@ -233,9 +245,9 @@ fun TermsAndCo(
             verticalAlignment = Alignment.CenterVertically
         ) {
 
-            Text(text = "By signing up, you agree to our", fontSize = 12.sp)
+            Text(text = stringResource(R.string.signup_terms_text), fontSize = 12.sp)
             Text(
-                text = "Terms & Conditions",
+                text = stringResource(R.string.terms_conditions),
                 fontWeight = FontWeight.Bold,
                 color = Blue,
                 fontSize = 12.sp,
@@ -250,9 +262,9 @@ fun TermsAndCo(
             horizontalArrangement = Arrangement.Start,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(text = "and", fontSize = 12.sp)
+            Text(text = stringResource(R.string.and), fontSize = 12.sp)
             Text(
-                text = "Privacy Policy",
+                text = stringResource(R.string.privacy_policy),
                 fontWeight = FontWeight.Bold,
                 color = Blue,
                 maxLines = 1,
@@ -269,15 +281,18 @@ fun TermsAndCo(
 }
 
 @Composable
-fun ProgressBar() {
-    Log.e("ProgressBar","Composing")
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ){
-        CircularProgressIndicator(color = Yellow)
-    }
+fun AuthProgressBar(color: Color = Color.White) {
 
-    Log.e("ProgressBar","Composed")
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = Yellow
+    ) {
+
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            CircularProgressIndicator(color = color, modifier = Modifier.size(50.dp))
+
+        }
+
+    }
 
 }

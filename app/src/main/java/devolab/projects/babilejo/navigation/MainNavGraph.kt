@@ -11,6 +11,7 @@ import devolab.projects.babilejo.ui.main.explore.ExploreViewModel
 import devolab.projects.babilejo.ui.main.home.HomeScreen
 import devolab.projects.babilejo.ui.main.messages.MessagesScreen
 import devolab.projects.babilejo.ui.main.profile.ProfileScreen
+import devolab.projects.babilejo.ui.main.settings.SettingsScreen
 
 fun NavGraphBuilder.mainNavGraph(
     navController: NavHostController,
@@ -40,6 +41,10 @@ fun NavGraphBuilder.mainNavGraph(
 
         composable(Screens.Profile.route) {
             ProfileScreen(navController)
+        }
+
+        composable(Screens.Settings.route){
+            SettingsScreen(navController)
         }
 
 

@@ -7,8 +7,6 @@ import devolab.projects.babilejo.util.OneTapLoginResponse
 
 interface UserAuthRepository {
 
-    val isUserAuthenticatedInFirebase: Boolean
-
     suspend fun oneTapSignInWithGoogle(): OneTapLoginResponse
 
     suspend fun firebaseSignInWithGoogle(googleCredential: AuthCredential): LoginWithGoogleResponse
@@ -21,5 +19,9 @@ interface UserAuthRepository {
     ): AuthResponse
 
     suspend fun emailLogin(email: String, password: String): AuthResponse
+
+    suspend fun logOut()
+
+    fun isUserAuthenticated():Boolean
 
 }

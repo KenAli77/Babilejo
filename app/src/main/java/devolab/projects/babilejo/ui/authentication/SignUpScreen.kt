@@ -40,8 +40,6 @@ fun SignUpScreen(
     scaffoldState: ScaffoldState = rememberScaffoldState(),
 ) {
 
-    val state = viewModel.signUpState
-    val googleLogin = viewModel.loginState
     var userName by remember { mutableStateOf("") }
     var eMail by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -49,22 +47,8 @@ fun SignUpScreen(
 
     val context = LocalContext.current
 
-
-
     Surface(color = Yellow, modifier = Modifier.fillMaxSize()) {
 
-        if (state is Resource.Loading) {
-            Column(
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally,
-
-                ) {
-                CircularProgressIndicator(
-                    color = Yellow,
-                    strokeWidth = 5.dp,
-                )
-            }
-        }
 
         Column(
             modifier = Modifier
@@ -109,6 +93,9 @@ fun SignUpScreen(
             )
 
             Spacer(modifier = Modifier.height(20.dp))
+
+            Signup(navigateToHomeScreen = { navController.navigate(Screens.Login.route) })
+
             RegularButton(
                 text = stringResource(R.string.sign_up),
                 modifier = Modifier.fillMaxWidth(),

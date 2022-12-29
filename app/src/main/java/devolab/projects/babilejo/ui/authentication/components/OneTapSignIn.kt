@@ -7,7 +7,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.android.gms.auth.api.identity.BeginSignInResult
 import devolab.projects.babilejo.domain.model.Resource
-import devolab.projects.babilejo.ui.authentication.components.ProgressBar
+import devolab.projects.babilejo.ui.authentication.components.AuthProgressBar
 
 @Composable
 fun OneTapSignIn(
@@ -16,7 +16,7 @@ fun OneTapSignIn(
 ) {
     val context = LocalContext.current
     when (val oneTapSignInResponse = viewModel.googleLoginState) {
-        is Resource.Loading -> ProgressBar()
+        is Resource.Loading -> AuthProgressBar()
         is Resource.Success -> oneTapSignInResponse.data?.let {
             LaunchedEffect(it) {
                 launch(it)

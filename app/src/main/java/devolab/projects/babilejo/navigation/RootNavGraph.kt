@@ -2,12 +2,11 @@ package devolab.projects.babilejo.navigation
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Scaffold
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -35,8 +34,6 @@ fun RootNavGraph(
     userViewModel: UserAuthViewModel = viewModel(),
     exploreViewModel: ExploreViewModel = viewModel()
 ) {
-    val startDestination =  if (userViewModel.isUserAuthenticated()) MAIN_ROUTE else AUTH_ROUTE
-
 
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -53,28 +50,44 @@ fun RootNavGraph(
 
         }
     }
+    var bottomBarState by remember { mutableStateOf(false) }
+
+    val startDestination = if (userViewModel.isUserAuthenticated()) {
+        MAIN_ROUTE
+    } else {
+        AUTH_ROUTE
+    }
+    Log.e("rootNav","composing")
     val navBackStackEntry by navController.currentBackStackEntryAsState()
 
+    Log.e("bottomBar",bottomBarState.toString())
     val currentRoute = navBackStackEntry?.destination?.route
-    val bottomBarState = currentRoute != Screens.Login.route && currentRoute != Screens.Signup.route
 
+    LaunchedEffect(key1 = currentRoute){
+        currentRoute?.let {
+            bottomBarState = it != Screens.Login.route && it != Screens.Signup.route
+        }
+    }
+
+    Log.e("bottomBar",bottomBarState.toString())
     Scaffold(bottomBar = {
         if (bottomBarState) {
             BottomNavBar(
+
                 navController = navController
             )
+            Log.e("bottomBar",bottomBarState.toString())
         }
     }) {
 
-        val paddingValues =
-            if (bottomBarState) {
-                it
-            } else {
-                PaddingValues(0.dp)
-            }
+        val paddingValues = if (bottomBarState) {
+            it
+        } else {
+            PaddingValues(0.dp)
+        }
         NavHost(
             navController = navController,
-            startDestination = AUTH_ROUTE,
+            startDestination = startDestination,
             route = ROOT_ROUTE,
             modifier = Modifier.padding(paddingValues)
         ) {

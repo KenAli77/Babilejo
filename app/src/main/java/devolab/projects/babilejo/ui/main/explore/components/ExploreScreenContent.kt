@@ -2,12 +2,10 @@ package devolab.projects.babilejo.ui.main.explore.components
 
 import android.widget.Toast
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import devolab.projects.babilejo.domain.model.Resource
-import devolab.projects.babilejo.ui.authentication.components.ProgressBar
+import devolab.projects.babilejo.ui.authentication.components.AuthProgressBar
 import devolab.projects.babilejo.ui.main.explore.ExploreViewModel
 
 @Composable
@@ -21,7 +19,7 @@ fun ExploreScreenContent(viewModel: ExploreViewModel = hiltViewModel(),
             Toast.makeText(context,currentPosition.message.toString(),Toast.LENGTH_SHORT).show()
         }
         is Resource.Loading -> {
-            ProgressBar()
+            AuthProgressBar()
         }
         is Resource.Success -> {
             currentPosition.data?.let { location ->

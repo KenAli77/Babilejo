@@ -15,7 +15,7 @@ fun GoogleLogin(
 ) {
     val context = LocalContext.current
     when(val signInWithGoogleResponse = viewModel.signInWithGoogleResponse) {
-        is Resource.Loading -> ProgressBar()
+        is Resource.Loading -> AuthProgressBar()
         is Resource.Success -> signInWithGoogleResponse.data?.let { signedIn ->
             LaunchedEffect(signedIn) {
                 navigateToHomeScreen(signedIn)

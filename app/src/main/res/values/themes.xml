@@ -3,5 +3,7 @@
 
     <style name="Theme.Babilejo" parent="android:Theme.Material.Light.NoActionBar">
         <item name="android:statusBarColor">@color/yellow</item>
+        <item name="android:navigationBarColor">@color/yellow</item>
+
     </style>
 </resources>

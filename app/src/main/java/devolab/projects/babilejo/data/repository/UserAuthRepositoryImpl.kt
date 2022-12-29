@@ -1,12 +1,14 @@
 package devolab.projects.babilejo.data.repository
 
 import android.util.Log
+import com.google.android.gms.auth.api.Auth
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.SignInClient
 import com.google.firebase.auth.*
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 import devolab.projects.babilejo.domain.model.Resource
+import devolab.projects.babilejo.domain.model.User
 import devolab.projects.babilejo.domain.repository.UserAuthRepository
 import devolab.projects.babilejo.util.*
 import devolab.projects.babilejo.util.SIGN_IN_REQUEST
@@ -26,8 +28,14 @@ class UserAuthRepositoryImpl @Inject constructor(
     private val db: FirebaseFirestore
 ) : UserAuthRepository {
 
-    override val isUserAuthenticatedInFirebase: Boolean
-        get() = auth.currentUser != null
+    override fun isUserAuthenticated(): Boolean {
+       var loggedIn = false
+        auth.addAuthStateListener(){
+          loggedIn =   it.currentUser != null
+        }
+
+        return loggedIn
+    }
 
     override suspend fun oneTapSignInWithGoogle(): OneTapLoginResponse {
         return try {
@@ -49,8 +57,10 @@ class UserAuthRepositoryImpl @Inject constructor(
             val authResult = auth.signInWithCredential(googleCredential).await()
             val isNewUser = authResult.additionalUserInfo?.isNewUser ?: false
             if (isNewUser) {
-                addUserToFirestore()
+                val user = auth.currentUser?.toUser()
+                addUserToFirestore(user!!)
             }
+
             Resource.Success(true)
         } catch (e: Exception) {
             Resource.Error(e.localizedMessage.toString())
@@ -69,11 +79,21 @@ class UserAuthRepositoryImpl @Inject constructor(
                return Resource.Error("passwords are not matching")
 
             }
+            if(userName.isEmpty() || userEmailAddress.isEmpty()) {
+                return Resource.Error("please all required fields")
+            }
             val registrationResult =
                 auth.createUserWithEmailAndPassword(userEmailAddress, userLoginPassword)
                     .await()
 
-            addUserToFirestore()
+            val user = User(
+                uid = auth.currentUser?.uid ,
+                userName = userName,
+                userEmail = userEmailAddress,
+                displayName = auth.currentUser?.displayName,
+                photoUrl = auth.currentUser?.photoUrl.toString()
+            )
+            addUserToFirestore(user)
 
             Resource.Success(registrationResult)
 
@@ -94,10 +114,19 @@ class UserAuthRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun logOut() {
+        Log.e("user1",auth.currentUser?.uid.toString())
+        Log.e("user1",auth.uid.toString())
+        auth.signOut()
+        oneTapClient.signOut()
+        Log.e("user",auth.currentUser?.uid.toString())
+        Log.e("user",auth.uid.toString())
+    }
 
-    private suspend fun addUserToFirestore() {
+
+    private suspend fun addUserToFirestore(user: User) {
         auth.currentUser?.apply {
-            val user = toUser()
+
             db.collection(USERS).document(uid).set(user).await()
         }
     }
