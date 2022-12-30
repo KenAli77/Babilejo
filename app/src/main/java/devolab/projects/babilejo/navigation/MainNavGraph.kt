@@ -9,7 +9,7 @@ import devolab.projects.babilejo.ui.authentication.UserAuthViewModel
 import devolab.projects.babilejo.ui.main.explore.ExploreScreen
 import devolab.projects.babilejo.ui.main.explore.LocationViewModel
 import devolab.projects.babilejo.ui.main.home.HomeScreen
-import devolab.projects.babilejo.ui.main.home.NewPostScreen
+import devolab.projects.babilejo.ui.main.newPost.NewPostScreen
 import devolab.projects.babilejo.ui.main.messages.MessagesScreen
 import devolab.projects.babilejo.ui.main.profile.ProfileScreen
 import devolab.projects.babilejo.ui.main.settings.SettingsScreen

@@ -15,8 +15,7 @@ import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material.icons.rounded.LocationOn
 import androidx.compose.material.icons.rounded.MoreHoriz
 import androidx.compose.material.ripple.rememberRipple
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -24,7 +23,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -32,12 +30,40 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.skydoves.landscapist.glide.GlideImage
 import devolab.projects.babilejo.R
+import devolab.projects.babilejo.domain.model.Post
+import devolab.projects.babilejo.domain.model.User
 import devolab.projects.babilejo.ui.theme.Yellow
+import devolab.projects.babilejo.util.getTimeAgo
 
 
 @Composable
-fun Post() {
+fun Post(post: Post, user: User, locality: String) {
+    var userPhotoUrl by remember { mutableStateOf("") }
+    var userName by remember { mutableStateOf("") }
+    var timeAgo by remember {
+        mutableStateOf("")
+    }
+    var postPhotoUrl by remember { mutableStateOf("") }
+    var caption by remember { mutableStateOf("") }
 
+    user.userName?.let {
+        userName = it
+    }
+    user.photoUrl?.let {
+        userPhotoUrl = it
+    }
+    post.timeStamp?.let {
+
+        timeAgo = getTimeAgo(it)
+
+    }
+    post.photoUrl?.let {
+        postPhotoUrl = it
+    }
+
+    post.caption?.let {
+        caption = it
+    }
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -45,18 +71,26 @@ fun Post() {
             .padding(vertical = 5.dp)
             .background(Color.White),
 
-    ) {
+        ) {
 
         Column(
             Modifier
                 .fillMaxWidth()
-                .padding(vertical = 10.dp)
-                ,
+                .padding(vertical = 10.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
             horizontalAlignment = Alignment.Start,
         ) {
-            Row(Modifier.fillMaxWidth().padding(horizontal = 10.dp), horizontalArrangement = Arrangement.SpaceBetween) {
-                PostHeader()
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 10.dp), horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                PostHeader(
+                    location = locality,
+                    userName = userName,
+                    time = timeAgo,
+                    photoUrl = userPhotoUrl
+                )
                 Icon(
                     imageVector = Icons.Rounded.MoreHoriz,
                     contentDescription = "more",
@@ -64,10 +98,10 @@ fun Post() {
 
             }
 
-            Caption(Modifier.padding(horizontal = 10.dp))
+            Caption(Modifier.padding(horizontal = 10.dp), text = caption)
 
             GlideImage(
-                imageModel = "https://images.pexels.com/photos/1745747/pexels-photo-1745747.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+                imageModel = postPhotoUrl,
                 contentScale = ContentScale.Crop,
                 contentDescription = null,
                 modifier = Modifier
@@ -91,7 +125,12 @@ fun PostPreview() {
 
 
 @Composable
-fun PostHeader() {
+fun PostHeader(
+    location: String = "no location info",
+    userName: String = "",
+    time: String,
+    photoUrl: String = "https://images.pexels.com/photos/14584497/pexels-photo-14584497.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+) {
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -100,7 +139,7 @@ fun PostHeader() {
 
         GlideImage(
             contentScale = ContentScale.Crop,
-            imageModel = "https://images.pexels.com/photos/14584497/pexels-photo-14584497.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+            imageModel = photoUrl,
             contentDescription = null,
             modifier = Modifier
                 .clip(
@@ -113,11 +152,10 @@ fun PostHeader() {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.Start
         ) {
-            Text(text = "Riley", fontWeight = FontWeight.Bold, fontSize = 15.sp)
-            Text(text = "1 hour ago", color = Color.DarkGray, fontSize = 10.sp)
+            Text(text = userName, fontWeight = FontWeight.Bold, fontSize = 15.sp)
+            Text(text = time, color = Color.DarkGray, fontSize = 10.sp)
             Text(
-                text = "Portofino Market",
-                fontStyle = FontStyle.Italic,
+                text = location,
                 color = Yellow,
                 fontSize = 10.sp
             )
@@ -127,7 +165,7 @@ fun PostHeader() {
 }
 
 @Composable
-fun PostActionsBar(modifier: Modifier=Modifier) {
+fun PostActionsBar(modifier: Modifier = Modifier) {
 
     Row(
         modifier = modifier.fillMaxWidth(),
@@ -199,7 +237,8 @@ fun PostActionsBar(modifier: Modifier=Modifier) {
                 role = Role.Button,
                 enabled = true,
                 onClick = {},
-                indication = rememberRipple(bounded = false, radius = 16.dp)),
+                indication = rememberRipple(bounded = false, radius = 16.dp)
+            ),
             tint = Yellow
         )
 
@@ -208,8 +247,8 @@ fun PostActionsBar(modifier: Modifier=Modifier) {
 }
 
 @Composable
-fun Caption(modifier: Modifier,text:String=stringResource(id = R.string.lorem_ipsum)) {
-    Column(modifier=modifier) {
+fun Caption(modifier: Modifier, text: String = stringResource(id = R.string.lorem_ipsum)) {
+    Column(modifier = modifier) {
         Text(
             maxLines = 3,
             overflow = TextOverflow.Ellipsis,

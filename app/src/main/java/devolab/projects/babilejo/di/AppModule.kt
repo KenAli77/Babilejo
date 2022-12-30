@@ -15,6 +15,8 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.ktx.storage
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -23,10 +25,9 @@ import dagger.hilt.components.SingletonComponent
 import devolab.projects.babilejo.R
 import devolab.projects.babilejo.data.location.DefaultLocationTracker
 import devolab.projects.babilejo.data.repository.UserAuthRepositoryImpl
-import devolab.projects.babilejo.data.repository.UserProfileRepositoryImpl
-import devolab.projects.babilejo.domain.location.LocationTracker
+import devolab.projects.babilejo.data.repository.MainRepositoryImpl
 import devolab.projects.babilejo.domain.repository.UserAuthRepository
-import devolab.projects.babilejo.domain.repository.UserProfileRepository
+import devolab.projects.babilejo.domain.repository.MainRepository
 import devolab.projects.babilejo.ui.authentication.UserAuthViewModel
 import devolab.projects.babilejo.util.SIGN_IN_REQUEST
 import devolab.projects.babilejo.util.SIGN_UP_REQUEST
@@ -44,6 +45,8 @@ object AppModule {
     @Provides
     fun provideFirebaseFirestore() = Firebase.firestore
 
+    @Provides
+    fun provideFirebaseStorage() = Firebase.storage
     @Provides
     fun provideOneTapClient(
         @ApplicationContext
@@ -97,7 +100,7 @@ object AppModule {
     fun providesAuthViewModel(
         repo: UserAuthRepositoryImpl,
         oneTapClient: SignInClient,
-        userProfileRepo: UserProfileRepositoryImpl
+        userProfileRepo: MainRepositoryImpl
     ): UserAuthViewModel {
         return UserAuthViewModel(repo, oneTapClient, userProfileRepo = userProfileRepo)
     }
@@ -127,12 +130,16 @@ object AppModule {
         auth: FirebaseAuth,
         oneTapClient: SignInClient,
         signInClient: GoogleSignInClient,
-        db: FirebaseFirestore
-    ): UserProfileRepository = UserProfileRepositoryImpl(
+        db: FirebaseFirestore,
+        firestore: FirebaseFirestore,
+        storage: FirebaseStorage
+    ): MainRepository = MainRepositoryImpl(
         auth = auth,
         oneTapClient = oneTapClient,
         signInClient = signInClient,
-        db = db
+        db = db,
+        firestore = firestore,
+        storage = storage
     )
 
     @Provides

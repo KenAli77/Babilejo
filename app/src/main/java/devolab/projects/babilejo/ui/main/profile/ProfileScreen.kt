@@ -10,14 +10,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import devolab.projects.babilejo.ui.main.UserProfileViewModel
+import devolab.projects.babilejo.ui.main.MainViewModel
 
 @Composable
 fun ProfileScreen(navController: NavHostController) {
 
-    val profileViewModel = hiltViewModel<UserProfileViewModel>()
+    val profileViewModel = hiltViewModel<MainViewModel>()
 
     Surface(modifier = Modifier.fillMaxSize()) {
 
