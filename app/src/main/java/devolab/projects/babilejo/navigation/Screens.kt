@@ -30,5 +30,9 @@ sealed class Screens(
     object Settings : Screens(route = "settings_screen", title = R.string.settings, icon = Icons.Rounded.Settings)
 
 
+    //
+    object NewPost:Screens(route = "new_post_screen", title = R.string.new_post)
+
+
 
 }

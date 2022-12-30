@@ -6,14 +6,12 @@ import androidx.activity.compose.setContent
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
 import devolab.projects.babilejo.navigation.RootNavGraph
 import devolab.projects.babilejo.ui.theme.BabilejoTheme
 import devolab.projects.babilejo.ui.authentication.UserAuthViewModel
-import devolab.projects.babilejo.ui.main.explore.ExploreViewModel
 import javax.inject.Inject
 
 

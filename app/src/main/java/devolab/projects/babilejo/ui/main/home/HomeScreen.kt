@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import devolab.projects.babilejo.navigation.Screens
 import devolab.projects.babilejo.ui.authentication.UserAuthViewModel
 import devolab.projects.babilejo.ui.authentication.components.LogoutDialog
 import devolab.projects.babilejo.ui.main.UserProfileViewModel
@@ -47,7 +48,7 @@ fun HomeScreen(navController: NavHostController, authViewModel: UserAuthViewMode
         }
     }
 
-    val padding by animateDpAsState(targetValue = if(lazyListState.isScrolled)0.dp else TOP_BAR_HEIGHT)
+    val padding by animateDpAsState(targetValue = if (lazyListState.isScrolled) 0.dp else TOP_BAR_HEIGHT)
 
     val openDialog = remember {
         mutableStateOf(false)
@@ -73,8 +74,10 @@ fun HomeScreen(navController: NavHostController, authViewModel: UserAuthViewMode
             verticalArrangement = Arrangement.Center
         ) {
 
-            HomeTopBar(lazyListState = lazyListState)
-            
+            HomeTopBar(
+                lazyListState = lazyListState,
+                onPostClick = { navController.navigate(Screens.NewPost.route) })
+
             LazyColumn(state = lazyListState) {
 
                 items(10) {

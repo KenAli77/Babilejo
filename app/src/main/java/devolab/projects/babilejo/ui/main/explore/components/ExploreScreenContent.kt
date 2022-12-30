@@ -6,10 +6,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import devolab.projects.babilejo.domain.model.Resource
 import devolab.projects.babilejo.ui.authentication.components.AuthProgressBar
-import devolab.projects.babilejo.ui.main.explore.ExploreViewModel
+import devolab.projects.babilejo.ui.main.explore.LocationViewModel
 
 @Composable
-fun ExploreScreenContent(viewModel: ExploreViewModel = hiltViewModel(),
+fun ExploreScreenContent(viewModel: LocationViewModel = hiltViewModel(),
 ) = with(viewModel) {
     val context = LocalContext.current
 

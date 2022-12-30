@@ -6,7 +6,7 @@ import androidx.navigation.NavHostController
 import devolab.projects.babilejo.ui.main.explore.components.ExploreScreenContent
 
 @Composable
-fun ExploreScreen(navController: NavHostController, viewModel: ExploreViewModel = hiltViewModel()) =
+fun ExploreScreen(navController: NavHostController, viewModel: LocationViewModel = hiltViewModel()) =
     with(viewModel) {
 
         ExploreScreenContent(viewModel = viewModel)
