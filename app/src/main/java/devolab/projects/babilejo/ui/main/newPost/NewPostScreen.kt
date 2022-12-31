@@ -7,6 +7,7 @@ import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -45,7 +46,7 @@ fun NewPostScreen(navHostController: NavHostController, locationViewModel: Locat
     var caption by remember {
         mutableStateOf("")
     }
-    var postPhotoUrl by remember{ mutableStateOf("") }
+    var postPhotoUrl by remember { mutableStateOf("") }
 
     mainViewModel.userDataState.data?.let {
         user = it
@@ -121,7 +122,7 @@ fun NewPostScreen(navHostController: NavHostController, locationViewModel: Locat
         NewPostHeader(
             userName = userName,
             photoUrl = userPhotoUrl,
-            location = locationViewModel.locality,
+            location = locationViewModel.place,
             modifier = Modifier
                 .constrainAs(header) {
                     top.linkTo(topBar.bottom)
@@ -178,11 +179,22 @@ fun NewPostScreen(navHostController: NavHostController, locationViewModel: Locat
                 start.linkTo(parent.start)
                 end.linkTo(parent.end)
             },
-            onPost = {mainViewModel.addPost(
-                caption = caption,
-                photoUrl = imageUri,
-                location = locationViewModel.lastKnownPosition,
-            )}
+            onPost = {
+                if(caption.isNotEmpty() || imageUri != null) {
+                    mainViewModel.addPost(
+                        caption = caption,
+                        photoUrl = imageUri,
+                        location = locationViewModel.place,
+                        userName = userName,
+                        userPhotoUrl = userPhotoUrl
+                    )
+                    Toast.makeText(context, "loading post..", Toast.LENGTH_SHORT).show()
+                    navHostController.navigateUp()
+                } else {
+                    Toast.makeText(context, "the post is empty", Toast.LENGTH_SHORT).show()
+
+                }
+            }
         )
 
     }

@@ -1,5 +1,6 @@
 package devolab.projects.babilejo.ui.main.home.components
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -37,29 +38,30 @@ import devolab.projects.babilejo.util.getTimeAgo
 
 
 @Composable
-fun Post(post: Post, user: User, locality: String) {
+fun Post(post: Post, locality: String) {
     var userPhotoUrl by remember { mutableStateOf("") }
     var userName by remember { mutableStateOf("") }
     var timeAgo by remember {
         mutableStateOf("")
     }
-    var postPhotoUrl by remember { mutableStateOf("") }
     var caption by remember { mutableStateOf("") }
 
-    user.userName?.let {
-        userName = it
+    LaunchedEffect(key1 = post.userName) {
+        post.userName?.let {
+            userName = it
+        }
     }
-    user.photoUrl?.let {
+
+    post.userPhotoUrl?.let {
         userPhotoUrl = it
+        Log.e("userPhoto", it)
     }
     post.timeStamp?.let {
 
         timeAgo = getTimeAgo(it)
 
     }
-    post.photoUrl?.let {
-        postPhotoUrl = it
-    }
+
 
     post.caption?.let {
         caption = it
@@ -67,7 +69,6 @@ fun Post(post: Post, user: User, locality: String) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(20.dp))
             .padding(vertical = 5.dp)
             .background(Color.White),
 
@@ -83,7 +84,8 @@ fun Post(post: Post, user: User, locality: String) {
             Row(
                 Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 10.dp), horizontalArrangement = Arrangement.SpaceBetween
+                    .padding(horizontal = 10.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 PostHeader(
                     location = locality,
@@ -100,22 +102,27 @@ fun Post(post: Post, user: User, locality: String) {
 
             Caption(Modifier.padding(horizontal = 10.dp), text = caption)
 
-            GlideImage(
-                imageModel = postPhotoUrl,
-                contentScale = ContentScale.Crop,
-                contentDescription = null,
-                modifier = Modifier
-                    .height(300.dp),
+            post.photoUrl?.let {
+                GlideImage(
+                    imageModel = it,
+                    contentScale = ContentScale.FillWidth,
+                    contentDescription = null,
+                    modifier = Modifier.heightIn(max = 500.dp).height(intrinsicSize = IntrinsicSize.Min),
 
-                )
+                    )
+            }
 
-            PostActionsBar(Modifier.padding(horizontal = 10.dp))
+            PostActionsBar(
+                Modifier.padding(horizontal = 10.dp),
+                likes = post.likes ?: 0,
+                comments = post.comments?.size ?: 0,
+                shares = post.shares ?: 0
+            )
 
         }
-
     }
-
 }
+
 
 @Preview
 @Composable
@@ -126,10 +133,7 @@ fun PostPreview() {
 
 @Composable
 fun PostHeader(
-    location: String = "no location info",
-    userName: String = "",
-    time: String,
-    photoUrl: String = "https://images.pexels.com/photos/14584497/pexels-photo-14584497.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+    location: String = "no location info", userName: String, time: String, photoUrl: String
 ) {
 
     Row(
@@ -149,15 +153,12 @@ fun PostHeader(
 
             )
         Column(
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.Start
+            verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.Start
         ) {
             Text(text = userName, fontWeight = FontWeight.Bold, fontSize = 15.sp)
             Text(text = time, color = Color.DarkGray, fontSize = 10.sp)
             Text(
-                text = location,
-                color = Yellow,
-                fontSize = 10.sp
+                text = location, color = Yellow, fontSize = 10.sp
             )
         }
     }
@@ -165,7 +166,12 @@ fun PostHeader(
 }
 
 @Composable
-fun PostActionsBar(modifier: Modifier = Modifier) {
+fun PostActionsBar(
+    modifier: Modifier = Modifier,
+    likes: Int = 0,
+    shares: Int = 0,
+    comments: Int = 0
+) {
 
     Row(
         modifier = modifier.fillMaxWidth(),
@@ -184,12 +190,14 @@ fun PostActionsBar(modifier: Modifier = Modifier) {
                 indication = rememberRipple(bounded = false, radius = 16.dp)
             )
         )
-        Text(
-            text = "200",
-            fontSize = 10.sp,
-            modifier = Modifier.padding(5.dp),
-            fontWeight = FontWeight.SemiBold
-        )
+        if (likes > 0) {
+            Text(
+                text = likes.toString(),
+                fontSize = 10.sp,
+                modifier = Modifier.padding(5.dp),
+                fontWeight = FontWeight.SemiBold
+            )
+        }
         Spacer(modifier = Modifier.width(40.dp))
         Icon(
             imageVector = Icons.Outlined.Forum,
@@ -202,12 +210,14 @@ fun PostActionsBar(modifier: Modifier = Modifier) {
                 indication = rememberRipple(bounded = false, radius = 16.dp)
             )
         )
-        Text(
-            text = "16",
-            fontSize = 10.sp,
-            modifier = Modifier.padding(5.dp),
-            fontWeight = FontWeight.SemiBold
-        )
+        if (comments > 0) {
+            Text(
+                text = comments.toString(),
+                fontSize = 10.sp,
+                modifier = Modifier.padding(5.dp),
+                fontWeight = FontWeight.SemiBold
+            )
+        }
         Spacer(modifier = Modifier.width(40.dp))
         Icon(
             imageVector = Icons.Outlined.Share,
@@ -220,12 +230,15 @@ fun PostActionsBar(modifier: Modifier = Modifier) {
                 indication = rememberRipple(bounded = false, radius = 16.dp)
             )
         )
-        Text(
-            text = "7",
-            fontSize = 10.sp,
-            modifier = Modifier.padding(5.dp),
-            fontWeight = FontWeight.SemiBold
-        )
+        if (shares > 0) {
+            Text(
+                text = shares.toString(),
+                fontSize = 10.sp,
+                modifier = Modifier.padding(5.dp),
+                fontWeight = FontWeight.SemiBold
+            )
+        }
+
 
         Spacer(modifier = Modifier.width(40.dp))
 
@@ -250,10 +263,7 @@ fun PostActionsBar(modifier: Modifier = Modifier) {
 fun Caption(modifier: Modifier, text: String = stringResource(id = R.string.lorem_ipsum)) {
     Column(modifier = modifier) {
         Text(
-            maxLines = 3,
-            overflow = TextOverflow.Ellipsis,
-            text = text,
-            fontSize = 15.sp
+            maxLines = 3, overflow = TextOverflow.Ellipsis, text = text, fontSize = 15.sp
         )
 
     }

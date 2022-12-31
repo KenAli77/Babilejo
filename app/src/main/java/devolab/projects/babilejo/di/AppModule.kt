@@ -10,6 +10,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import com.google.android.libraries.places.api.Places
+import com.google.android.libraries.places.api.net.PlacesClient
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -22,6 +24,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import devolab.projects.babilejo.BuildConfig
 import devolab.projects.babilejo.R
 import devolab.projects.babilejo.data.location.DefaultLocationTracker
 import devolab.projects.babilejo.data.repository.UserAuthRepositoryImpl
@@ -47,6 +50,7 @@ object AppModule {
 
     @Provides
     fun provideFirebaseStorage() = Firebase.storage
+
     @Provides
     fun provideOneTapClient(
         @ApplicationContext
@@ -148,14 +152,27 @@ object AppModule {
         return LocationServices.getFusedLocationProviderClient(app)
     }
 
+    @Provides
+    @Singleton
+    fun providePlacesClient(app: Application): PlacesClient {
+        Places.initialize(app.applicationContext, BuildConfig.GOOGLE_MAPS_API_KEY)
+        return Places.createClient(app.applicationContext)
+
+    }
+
 
     @Provides
     @Singleton
     fun providesLocationTracker(
         app: Application,
-        locationProviderClient: FusedLocationProviderClient
+        locationProviderClient: FusedLocationProviderClient,
+        placesClient: PlacesClient
     ): DefaultLocationTracker =
-        DefaultLocationTracker(application = app, fusedLocationProviderClient = locationProviderClient)
+        DefaultLocationTracker(
+            application = app,
+            fusedLocationProviderClient = locationProviderClient,
+            placesClient = placesClient
+        )
 
 
 }

@@ -1,4 +1,4 @@
-package devolab.projects.babilejo.domain.state
+package devolab.projects.babilejo.ui.main.home.state
 
 import devolab.projects.babilejo.domain.model.Post
 

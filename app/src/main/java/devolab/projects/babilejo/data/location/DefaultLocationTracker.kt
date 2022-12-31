@@ -1,6 +1,7 @@
 package devolab.projects.babilejo.data.location
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
 import android.content.pm.PackageManager
@@ -14,6 +15,10 @@ import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.Priority
+import com.google.android.libraries.places.api.model.Place
+import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest
+import com.google.android.libraries.places.api.net.FindCurrentPlaceResponse
+import com.google.android.libraries.places.api.net.PlacesClient
 import devolab.projects.babilejo.domain.location.LocationTracker
 import devolab.projects.babilejo.domain.model.Resource
 import devolab.projects.babilejo.util.LocationResponse
@@ -23,12 +28,14 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import kotlin.coroutines.resume
 
 class DefaultLocationTracker @Inject constructor(
     private val fusedLocationProviderClient: FusedLocationProviderClient,
-    private val application: Application
+    private val application: Application,
+    private val placesClient: PlacesClient
 
 ) : LocationTracker {
 
@@ -47,6 +54,7 @@ class DefaultLocationTracker @Inject constructor(
     private var location: Location? = null
 
 
+    @SuppressLint("MissingPermission")
     override suspend fun getCurrentLocation(): Location? {
 
         val hasPermissionCoarseLocation = ContextCompat.checkSelfPermission(
@@ -91,6 +99,7 @@ class DefaultLocationTracker @Inject constructor(
         }
     }
 
+    @SuppressLint("MissingPermission")
     override suspend fun getLocationUpdates(): LocationResponse = callbackFlow {
 
         val hasPermissionCoarseLocation = ContextCompat.checkSelfPermission(
@@ -119,20 +128,40 @@ class DefaultLocationTracker @Inject constructor(
             }
 
             fusedLocationProviderClient.requestLocationUpdates(
-                locationRequest,
-                locationCallback,
-                Looper.getMainLooper()
+                locationRequest, locationCallback, Looper.getMainLooper()
             ).addOnFailureListener {
                 launch { send(Resource.Error(it.message.toString())) }
             }
 
-            awaitClose{
+            awaitClose {
                 fusedLocationProviderClient.removeLocationUpdates(locationCallback)
             }
 
 
         } else {
             send(Resource.Error("permissions not granted"))
+        }
+
+    }
+
+    @SuppressLint("MissingPermission")
+    override suspend fun getCurrentPlace(): Resource<FindCurrentPlaceResponse> {
+
+        val placeFields = listOf(Place.Field.NAME, Place.Field.ADDRESS, Place.Field.LAT_LNG)
+        val request = FindCurrentPlaceRequest.newInstance(placeFields)
+
+        return suspendCancellableCoroutine { cont ->
+            val result = placesClient.findCurrentPlace(request)
+            result.addOnFailureListener {
+                cont.resume(Resource.Error(it.message.toString()))
+            }
+            result.addOnSuccessListener {
+                cont.resume(Resource.Success(it))
+            }
+            result.addOnCanceledListener {
+                cont.cancel()
+            }
+
         }
 
     }

@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.google.android.libraries.places.api.Places
 import dagger.hilt.android.AndroidEntryPoint
 import devolab.projects.babilejo.navigation.RootNavGraph
 import devolab.projects.babilejo.ui.theme.BabilejoTheme
@@ -16,7 +17,7 @@ import javax.inject.Inject
 
 
 @AndroidEntryPoint
-class MainActivity: ComponentActivity() {
+class MainActivity : ComponentActivity() {
 
     private lateinit var navController: NavHostController
 
@@ -25,7 +26,6 @@ class MainActivity: ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
 
         setContent {
 
@@ -41,10 +41,6 @@ class MainActivity: ComponentActivity() {
 
 
     }
-
-
-
-
 
 
 }

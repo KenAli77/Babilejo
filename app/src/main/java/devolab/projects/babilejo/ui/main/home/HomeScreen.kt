@@ -4,9 +4,8 @@ import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -18,15 +17,18 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import devolab.projects.babilejo.domain.model.Resource
 import devolab.projects.babilejo.domain.model.User
 import devolab.projects.babilejo.navigation.Screens
 import devolab.projects.babilejo.ui.authentication.UserAuthViewModel
+import devolab.projects.babilejo.ui.authentication.components.AuthProgressBar
 import devolab.projects.babilejo.ui.authentication.components.LogoutDialog
 import devolab.projects.babilejo.ui.main.MainViewModel
 import devolab.projects.babilejo.ui.main.explore.LocationViewModel
 import devolab.projects.babilejo.ui.main.home.components.HomeTopBar
 import devolab.projects.babilejo.ui.main.home.components.Post
 import devolab.projects.babilejo.ui.theme.LightYellow
+import devolab.projects.babilejo.ui.theme.Yellow
 import devolab.projects.babilejo.util.TOP_BAR_HEIGHT
 import devolab.projects.babilejo.util.isScrolled
 
@@ -40,7 +42,7 @@ fun HomeScreen(navController: NavHostController, authViewModel: UserAuthViewMode
 
     val lazyListState = rememberLazyListState()
 
-    val posts = mainViewModel.feedState.data
+    val state = mainViewModel.feedState
 
     val padding by animateDpAsState(targetValue = if (lazyListState.isScrolled) 0.dp else TOP_BAR_HEIGHT)
 
@@ -50,9 +52,7 @@ fun HomeScreen(navController: NavHostController, authViewModel: UserAuthViewMode
 
     BackHandler(true) {
 
-        Toast.makeText(context, "log out?", Toast.LENGTH_SHORT).show()
         openDialog.value = true
-
 
     }
 
@@ -60,31 +60,31 @@ fun HomeScreen(navController: NavHostController, authViewModel: UserAuthViewMode
         authViewModel.logOut()
         navController.navigateUp()
     })
-    Surface(modifier = Modifier.fillMaxSize(), color = LightYellow) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Yellow.copy(0.5f)),
+    ) {
+        if (state.loading) {
+            AuthProgressBar()
+        }
 
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
+        state.data?.let {
+            LazyColumn(state = lazyListState, modifier = Modifier.padding(top = 65.dp)) {
 
-            HomeTopBar(
-                lazyListState = lazyListState,
-                onPostClick = { navController.navigate(Screens.NewPost.route) })
-
-            posts?.let {
-                LazyColumn(state = lazyListState) {
-
-                    items(it) { item ->
-                        val locality = item.location?.let { it1 ->
-                            locationViewModel.getLocalityFromLocation(it1)
-                        }
-                        val user = mainViewModel.getUserFromId(item.uid)
-                        Post(post = item, user = user, locality = locality!!)
+                items(it) { item ->
+                    val locality = item.location?.let { loc ->
+                        locationViewModel.getLocalityFromLocation(loc)
                     }
+                    Post(post = item, locality = locality?:"")
                 }
             }
-
         }
+
+        HomeTopBar(
+            lazyListState = lazyListState,
+            onPostClick = { navController.navigate(Screens.NewPost.route) })
+
+
     }
 }

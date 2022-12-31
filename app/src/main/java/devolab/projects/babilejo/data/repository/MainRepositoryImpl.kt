@@ -2,6 +2,7 @@ package devolab.projects.babilejo.data.repository
 
 import android.net.Uri
 import android.util.Log
+import androidx.lifecycle.MutableLiveData
 import com.google.android.gms.auth.api.identity.SignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.firebase.auth.FirebaseAuth
@@ -91,9 +92,9 @@ class MainRepositoryImpl @Inject constructor(
                     launch {
                         photoRef.putFile(imageUri)
                             .addOnSuccessListener {
-                                val photoUrl = photoRef.downloadUrl.result.toString()
-                                post.id?.let { postId->
-                                    post.photoUrl = photoUrl
+                                val photoUrl = photoRef.downloadUrl.result
+                                post.id?.let { postId ->
+                                    post.photoUrl = photoUrl.toString()
                                     launch {
                                         firestore.collection("posts_global").document(postId)
                                             .set(post).await()
@@ -116,16 +117,24 @@ class MainRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getPosts(): Resource<QuerySnapshot> {
-        return withContext(Dispatchers.IO) {
-            try {
-                val result = firestore.collection("posts_global").get().await()
-                Resource.Success(result)
-            } catch (e: Exception) {
-                e.printStackTrace()
-                Resource.Error(e.message.toString())
+    override suspend fun getPosts(): MutableLiveData<Resource<QuerySnapshot>> {
+        val result = MutableLiveData<Resource<QuerySnapshot>>()
+
+        firestore.collection("posts_global").addSnapshotListener { value, error ->
+
+                error?.let {
+                    it.printStackTrace()
+                    Log.e("error fetching posts", it.message.toString())
+                    result.value = Resource.Error(it.message.toString())
+                }
+
+                value?.let {
+                    result.value = Resource.Success(it)
+
+                }
+
             }
-        }
+         return result
     }
 
 

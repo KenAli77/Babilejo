@@ -3,6 +3,7 @@ package devolab.projects.babilejo.ui.main.explore
 import android.app.Application
 import android.location.Geocoder
 import android.location.Location
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -31,10 +32,13 @@ class LocationViewModel @Inject constructor(
 
     var locality by mutableStateOf("")
 
+    var place by mutableStateOf("")
+
     init {
         viewModelScope.launch {
             getPositionUpdates()
             getLastKnownPosition()
+            getPLace()
 
         }
     }
@@ -74,5 +78,28 @@ class LocationViewModel @Inject constructor(
         val address = geocoder.getFromLocation(location.latitude!!, location.longitude!!, 1)
 
         return address?.get(0)?.locality.toString()
+    }
+
+    fun getPLace() = viewModelScope.launch {
+        val result = locationTracker.getCurrentPlace()
+
+        when (result){
+            is Resource.Error -> {
+                Log.e("error fetching place",result.message.toString())
+            }
+            is Resource.Loading -> {
+
+                Log.e("Place","Loading...")
+            }
+            is Resource.Success -> {
+                val placeResult = result.data?.placeLikelihoods?.get(0)?.place
+
+                placeResult?.name?.let{
+                    place = it
+                }
+
+                Log.e("place",placeResult?.name.toString())
+            }
+        }
     }
 }
