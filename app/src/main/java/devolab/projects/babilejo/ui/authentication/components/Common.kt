@@ -1,6 +1,7 @@
 package devolab.projects.babilejo.ui.authentication.components
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -281,14 +282,15 @@ fun TermsAndCo(
 }
 
 @Composable
-fun AuthProgressBar(color: Color = Color.White) {
+fun AuthProgressBar(color: Color = Color.White,modifier: Modifier=Modifier) {
 
     Surface(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
         color = Yellow
     ) {
 
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Box(modifier = Modifier.fillMaxSize().background(Yellow), contentAlignment = Alignment.Center) {
+
             CircularProgressIndicator(color = color, modifier = Modifier.size(50.dp))
 
         }

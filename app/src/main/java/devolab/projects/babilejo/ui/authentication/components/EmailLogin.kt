@@ -14,19 +14,19 @@ fun EmailLogin(
     viewModel: UserAuthViewModel = hiltViewModel(),
     navigateHome:() -> Unit
 ) {
-    Log.e("EmailLogin","composed")
-    val context = LocalContext.current
-    when (val authResponse = viewModel.loginState) {
-        is Resource.Loading ->
-        { AuthProgressBar() }
-        is Resource.Success -> authResponse.data?.let {
-            LaunchedEffect(it) {
-                navigateHome()
-            }
-        }
-        is Resource.Error -> LaunchedEffect(Unit) {
-            print(authResponse.message.toString())
-            Toast.makeText(context,authResponse.message, Toast.LENGTH_LONG).show()
-        }
-    }
+//    Log.e("EmailLogin","composed")
+//    val context = LocalContext.current
+//    when (val authResponse = viewModel.loginState) {
+//        is Resource.Loading ->
+//        { AuthProgressBar() }
+//        is Resource.Success -> authResponse.data?.let {
+//            LaunchedEffect(it) {
+//                navigateHome()
+//            }
+//        }
+//        is Resource.Error -> LaunchedEffect(Unit) {
+//            print(authResponse.message.toString())
+//            Toast.makeText(context,authResponse.message, Toast.LENGTH_LONG).show()
+//        }
+//    }
 }

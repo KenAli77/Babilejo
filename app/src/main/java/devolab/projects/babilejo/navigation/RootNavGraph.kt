@@ -20,7 +20,7 @@ import devolab.projects.babilejo.navigation.Graph.AUTH_ROUTE
 import devolab.projects.babilejo.navigation.Graph.MAIN_ROUTE
 import devolab.projects.babilejo.navigation.Graph.ROOT_ROUTE
 import devolab.projects.babilejo.ui.authentication.UserAuthViewModel
-import devolab.projects.babilejo.ui.main.explore.LocationViewModel
+import devolab.projects.babilejo.ui.main.explore.ExploreViewModel
 import kotlinx.coroutines.launch
 
 @SuppressLint("CoroutineCreationDuringComposition")
@@ -29,7 +29,7 @@ import kotlinx.coroutines.launch
 fun RootNavGraph(
     navController: NavHostController,
     userViewModel: UserAuthViewModel = viewModel(),
-    locationViewModel: LocationViewModel = viewModel()
+    exploreViewModel: ExploreViewModel = viewModel()
 ) {
 
     val coroutineScope = rememberCoroutineScope()
@@ -94,7 +94,7 @@ fun RootNavGraph(
             )
 
             mainNavGraph(
-                locationViewModel = locationViewModel,
+                exploreViewModel = exploreViewModel,
                 userAuthViewModel = userViewModel,
                 navController = navController
             )

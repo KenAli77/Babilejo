@@ -7,7 +7,7 @@ import androidx.navigation.navigation
 import devolab.projects.babilejo.navigation.Graph.MAIN_ROUTE
 import devolab.projects.babilejo.ui.authentication.UserAuthViewModel
 import devolab.projects.babilejo.ui.main.explore.ExploreScreen
-import devolab.projects.babilejo.ui.main.explore.LocationViewModel
+import devolab.projects.babilejo.ui.main.explore.ExploreViewModel
 import devolab.projects.babilejo.ui.main.home.HomeScreen
 import devolab.projects.babilejo.ui.main.newPost.NewPostScreen
 import devolab.projects.babilejo.ui.main.messages.MessagesScreen
@@ -16,7 +16,7 @@ import devolab.projects.babilejo.ui.main.settings.SettingsScreen
 
 fun NavGraphBuilder.mainNavGraph(
     navController: NavHostController,
-    locationViewModel: LocationViewModel,
+    exploreViewModel: ExploreViewModel,
     userAuthViewModel: UserAuthViewModel
 
 ) {
@@ -34,7 +34,7 @@ fun NavGraphBuilder.mainNavGraph(
         }
 
         composable(Screens.Explore.route) {
-            ExploreScreen(navController, locationViewModel)
+            ExploreScreen(navController)
         }
         composable(Screens.Messages.route) {
             MessagesScreen(navController)
@@ -49,7 +49,7 @@ fun NavGraphBuilder.mainNavGraph(
         }
 
         composable(Screens.NewPost.route) {
-            NewPostScreen(navHostController = navController,locationViewModel = locationViewModel)
+            NewPostScreen(navHostController = navController)
         }
 
 

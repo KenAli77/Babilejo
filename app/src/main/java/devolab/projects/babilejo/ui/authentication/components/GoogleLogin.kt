@@ -13,17 +13,17 @@ fun GoogleLogin(
     viewModel: UserAuthViewModel = hiltViewModel(),
     navigateToHomeScreen: (signedIn: Boolean) -> Unit
 ) {
-    val context = LocalContext.current
-    when(val signInWithGoogleResponse = viewModel.signInWithGoogleResponse) {
-        is Resource.Loading -> AuthProgressBar()
-        is Resource.Success -> signInWithGoogleResponse.data?.let { signedIn ->
-            LaunchedEffect(signedIn) {
-                navigateToHomeScreen(signedIn)
-            }
-        }
-        is Resource.Error -> LaunchedEffect(Unit) {
-            print(signInWithGoogleResponse.message.toString())
-            Toast.makeText(context,signInWithGoogleResponse.message, Toast.LENGTH_LONG).show()
-        }
-    }
+//    val context = LocalContext.current
+//    when(val signInWithGoogleResponse = viewModel.signInWithGoogleResponse) {
+//        is Resource.Loading -> AuthProgressBar()
+//        is Resource.Success -> signInWithGoogleResponse.data?.let { signedIn ->
+//            LaunchedEffect(signedIn) {
+//                navigateToHomeScreen(signedIn)
+//            }
+//        }
+//        is Resource.Error -> LaunchedEffect(Unit) {
+//            print(signInWithGoogleResponse.message.toString())
+//            Toast.makeText(context,signInWithGoogleResponse.message, Toast.LENGTH_LONG).show()
+//        }
+//    }
 }

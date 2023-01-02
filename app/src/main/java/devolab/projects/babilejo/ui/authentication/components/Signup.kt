@@ -13,21 +13,21 @@ fun Signup(
     viewModel: UserAuthViewModel = hiltViewModel(),
     navigateToHomeScreen: () -> Unit
 ) {
-    val context = LocalContext.current
-    when(val signInWithGoogleResponse = viewModel.signUpState) {
-        is Resource.Loading -> AuthProgressBar()
-        is Resource.Success -> {
-
-            viewModel.signUpState.data?.let {
-                LaunchedEffect(key1 = it){
-                    navigateToHomeScreen()
-                }
-            }
-
-        }
-        is Resource.Error -> LaunchedEffect(Unit) {
-            print(viewModel.signUpState.message.toString())
-            Toast.makeText(context,signInWithGoogleResponse.message, Toast.LENGTH_LONG).show()
-        }
-    }
+//    val context = LocalContext.current
+//    when(val signInWithGoogleResponse = viewModel.signUpState) {
+//        is Resource.Loading -> AuthProgressBar()
+//        is Resource.Success -> {
+//
+//            viewModel.signUpState.data?.let {
+//                LaunchedEffect(key1 = it){
+//                    navigateToHomeScreen()
+//                }
+//            }
+//
+//        }
+//        is Resource.Error -> LaunchedEffect(Unit) {
+//            print(viewModel.signUpState.message.toString())
+//            Toast.makeText(context,signInWithGoogleResponse.message, Toast.LENGTH_LONG).show()
+//        }
+//    }
 }

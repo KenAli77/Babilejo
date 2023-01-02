@@ -1,6 +1,7 @@
 package devolab.projects.babilejo.domain.model
 
 import android.net.Uri
+import com.google.android.libraries.places.api.model.Place
 
 data class Post(
     val id:String?=null,
@@ -13,5 +14,6 @@ data class Post(
     val userName: String? = null,
     val userPhotoUrl: String? = null,
     val likes:Int? = null,
-    val shares:Int? = null
+    val shares:Int? = null,
+    val place: String? = null,
 )

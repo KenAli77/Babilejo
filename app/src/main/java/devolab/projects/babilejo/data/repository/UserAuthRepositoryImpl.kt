@@ -30,7 +30,7 @@ class UserAuthRepositoryImpl @Inject constructor(
 
     override fun isUserAuthenticated(): Boolean {
        var loggedIn = false
-        auth.addAuthStateListener(){
+        auth.addAuthStateListener{
           loggedIn =   it.currentUser != null
         }
 
@@ -52,7 +52,7 @@ class UserAuthRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun firebaseSignInWithGoogle(googleCredential: AuthCredential): LoginWithGoogleResponse {
+    override suspend fun firebaseSignInWithGoogle(googleCredential: AuthCredential): AuthResponse {
         return try {
             val authResult = auth.signInWithCredential(googleCredential).await()
             val isNewUser = authResult.additionalUserInfo?.isNewUser ?: false
@@ -61,7 +61,7 @@ class UserAuthRepositoryImpl @Inject constructor(
                 addUserToFirestore(user!!)
             }
 
-            Resource.Success(true)
+            Resource.Success(authResult)
         } catch (e: Exception) {
             Resource.Error(e.localizedMessage.toString())
         }

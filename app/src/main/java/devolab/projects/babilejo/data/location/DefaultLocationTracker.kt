@@ -137,7 +137,6 @@ class DefaultLocationTracker @Inject constructor(
                 fusedLocationProviderClient.removeLocationUpdates(locationCallback)
             }
 
-
         } else {
             send(Resource.Error("permissions not granted"))
         }

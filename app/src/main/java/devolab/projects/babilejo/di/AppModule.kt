@@ -32,6 +32,7 @@ import devolab.projects.babilejo.data.repository.MainRepositoryImpl
 import devolab.projects.babilejo.domain.repository.UserAuthRepository
 import devolab.projects.babilejo.domain.repository.MainRepository
 import devolab.projects.babilejo.ui.authentication.UserAuthViewModel
+import devolab.projects.babilejo.ui.main.MainViewModel
 import devolab.projects.babilejo.util.SIGN_IN_REQUEST
 import devolab.projects.babilejo.util.SIGN_UP_REQUEST
 import javax.inject.Named
@@ -93,6 +94,7 @@ object AppModule {
         .build()
 
     @Provides
+    @Singleton
     fun provideGoogleSignInClient(
         app: Application,
         options: GoogleSignInOptions
@@ -101,13 +103,15 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun providesAuthViewModel(
-        repo: UserAuthRepositoryImpl,
-        oneTapClient: SignInClient,
-        userProfileRepo: MainRepositoryImpl
-    ): UserAuthViewModel {
-        return UserAuthViewModel(repo, oneTapClient, userProfileRepo = userProfileRepo)
-    }
+    fun provideMainViewModel(
+        repositoryImpl: MainRepositoryImpl,
+        locationTracker: DefaultLocationTracker,
+        app:Application
+    ):MainViewModel = MainViewModel(
+        repo = repositoryImpl,
+        locationTracker = locationTracker,
+        app = app
+    )
 
 
     @Provides

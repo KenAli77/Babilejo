@@ -9,7 +9,7 @@ interface UserAuthRepository {
 
     suspend fun oneTapSignInWithGoogle(): OneTapLoginResponse
 
-    suspend fun firebaseSignInWithGoogle(googleCredential: AuthCredential): LoginWithGoogleResponse
+    suspend fun firebaseSignInWithGoogle(googleCredential: AuthCredential): AuthResponse
 
     suspend fun emailSignUp(
         userName: String,

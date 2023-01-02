@@ -28,7 +28,7 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import devolab.projects.babilejo.domain.model.User
 import devolab.projects.babilejo.ui.main.MainViewModel
-import devolab.projects.babilejo.ui.main.explore.LocationViewModel
+import devolab.projects.babilejo.ui.main.explore.ExploreViewModel
 import devolab.projects.babilejo.ui.main.newPost.components.*
 import kotlinx.coroutines.launch
 import java.util.*
@@ -36,9 +36,10 @@ import java.util.*
 @SuppressLint("CoroutineCreationDuringComposition")
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalPermissionsApi::class)
 @Composable
-fun NewPostScreen(navHostController: NavHostController, locationViewModel: LocationViewModel) {
+fun NewPostScreen(navHostController: NavHostController) {
 
-    val mainViewModel = hiltViewModel<MainViewModel>()
+    val viewModel = hiltViewModel<NewPostViewModel>()
+
     var user by remember { mutableStateOf(User()) }
     var userName by remember { mutableStateOf("") }
     var userPhotoUrl by remember { mutableStateOf("") }
@@ -46,9 +47,8 @@ fun NewPostScreen(navHostController: NavHostController, locationViewModel: Locat
     var caption by remember {
         mutableStateOf("")
     }
-    var postPhotoUrl by remember { mutableStateOf("") }
 
-    mainViewModel.userDataState.data?.let {
+    viewModel.user?.let {
         user = it
     }
 
@@ -122,7 +122,7 @@ fun NewPostScreen(navHostController: NavHostController, locationViewModel: Locat
         NewPostHeader(
             userName = userName,
             photoUrl = userPhotoUrl,
-            location = locationViewModel.place,
+            location = viewModel.place,
             modifier = Modifier
                 .constrainAs(header) {
                     top.linkTo(topBar.bottom)
@@ -162,7 +162,6 @@ fun NewPostScreen(navHostController: NavHostController, locationViewModel: Locat
                     ImageContainer(image = it, modifier = Modifier
                         .constrainAs(imageView) {
                             top.linkTo(textField.bottom, margin = 10.dp)
-                            //bottom.linkTo(actionBar.top)
                         }
                         .padding(horizontal = 10.dp),
                         onRemove = { bitmap = null },
@@ -181,12 +180,10 @@ fun NewPostScreen(navHostController: NavHostController, locationViewModel: Locat
             },
             onPost = {
                 if(caption.isNotEmpty() || imageUri != null) {
-                    mainViewModel.addPost(
+                    viewModel.addPost(
                         caption = caption,
                         photoUrl = imageUri,
-                        location = locationViewModel.place,
-                        userName = userName,
-                        userPhotoUrl = userPhotoUrl
+                        imageUri = imageUri
                     )
                     Toast.makeText(context, "loading post..", Toast.LENGTH_SHORT).show()
                     navHostController.navigateUp()

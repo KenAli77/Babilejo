@@ -89,20 +89,17 @@ class MainRepositoryImpl @Inject constructor(
                 imageUri?.let {
                     val photoId = UUID.randomUUID()
                     val photoRef = storage.reference.child("photos/${photoId}")
-                    launch {
-                        photoRef.putFile(imageUri)
-                            .addOnSuccessListener {
-                                val photoUrl = photoRef.downloadUrl.result
-                                post.id?.let { postId ->
-                                    post.photoUrl = photoUrl.toString()
-                                    launch {
-                                        firestore.collection("posts_global").document(postId)
-                                            .set(post).await()
-                                    }
 
-                                }
+                    val result = photoRef.putFile(imageUri).await()
+                    if (result.task.isSuccessful) {
+                        val photoUrl = photoRef.downloadUrl.result
+                        post.id?.let { postId ->
+                            post.photoUrl = photoUrl.toString()
 
-                            }
+                            firestore.collection("posts_global").document(postId)
+                                .set(post).await()
+
+                        }
                     }
 
                 } ?: post.id?.let {
@@ -122,19 +119,19 @@ class MainRepositoryImpl @Inject constructor(
 
         firestore.collection("posts_global").addSnapshotListener { value, error ->
 
-                error?.let {
-                    it.printStackTrace()
-                    Log.e("error fetching posts", it.message.toString())
-                    result.value = Resource.Error(it.message.toString())
-                }
+            error?.let {
+                it.printStackTrace()
+                Log.e("error fetching posts", it.message.toString())
+                result.value = Resource.Error(it.message.toString())
+            }
 
-                value?.let {
-                    result.value = Resource.Success(it)
-
-                }
+            value?.let {
+                result.value = Resource.Success(it)
 
             }
-         return result
+
+        }
+        return result
     }
 
 

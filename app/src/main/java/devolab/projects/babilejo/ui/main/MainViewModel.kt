@@ -1,18 +1,19 @@
 package devolab.projects.babilejo.ui.main
 
+import android.app.Application
 import android.location.Location
 import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.firestore.ktx.toObject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import devolab.projects.babilejo.data.location.DefaultLocationTracker
 import devolab.projects.babilejo.data.repository.MainRepositoryImpl
-import devolab.projects.babilejo.ui.main.home.state.FeedState
+import devolab.projects.babilejo.ui.main.home.state.HomeState
 import devolab.projects.babilejo.domain.model.Post
 import devolab.projects.babilejo.domain.model.Resource
 import devolab.projects.babilejo.domain.model.User
@@ -25,20 +26,32 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val repo: MainRepositoryImpl,
+    private val locationTracker: DefaultLocationTracker,
+    private val app: Application,
+) : ViewModel() {
 
+    data class LocationState(
+        val location: Location? = null,
+        val loading: Boolean = false,
+        val error: String? = null
+    )
 
-    ) : ViewModel() {
+    var locationState by mutableStateOf(LocationState())
+        private set
+
+    var lastKnownPosition by mutableStateOf(Location(""))
 
     var userDataState by mutableStateOf<UserDataResponse>(Resource.Success(null))
 
-    var feedState by mutableStateOf(FeedState())
+    var homeState by mutableStateOf(HomeState())
 
-    //  var usersState by mutableStateOf<>()
-
+    var place by mutableStateOf("")
 
     init {
         getUserData()
-        getPosts()
+        getLastKnownPosition()
+        getPositionUpdates()
+        getPLace()
     }
 
 
@@ -47,96 +60,78 @@ class MainViewModel @Inject constructor(
         userDataState = repo.getUserData()
     }
 
-    fun addPost(
-        caption: String,
-        photoUrl: Uri?,
-        location: Location,
-        imageUri: Uri? = null,
-        userName: String,
-        userPhotoUrl: String
-    ) =
-        viewModelScope.launch {
 
-            val postId = UUID.randomUUID().toString()
-            userDataState.data?.let {
-                val post = Post(
-                    id = postId,
-                    uid = userDataState.data?.uid,
-                    location = location.toLocation(),
-                    caption = caption,
-                    photoUrl = photoUrl?.toString(),
-                    timeStamp = System.currentTimeMillis(),
-                    comments = null,
-                    userPhotoUrl = userPhotoUrl,
-                    userName = userName
-                )
-                repo.addPost(post, imageUri)
+    private fun getPositionUpdates() = viewModelScope.launch {
+        locationTracker.getLocationUpdates().collect { result ->
 
-            }
+            locationState = locationState.copy(
+                loading = true
+            )
 
-        }
+            when (result) {
 
-    private fun getPosts() = viewModelScope.launch {
-        val result = repo.getPosts()
-        feedState = feedState.copy(
-            loading = true
-        )
-        result.observeForever {
-            when (it) {
                 is Resource.Error -> {
-
-                    feedState = feedState.copy(
-                        loading = false,
-                        data = null,
-                        error = it.message
+                    locationState = locationState.copy(
+                        location = null,
+                        error = result.message,
+                        loading = false
                     )
-
                 }
                 is Resource.Loading -> {
-                    feedState = feedState.copy(
+                    locationState = locationState.copy(
                         loading = true,
-                        error = null,
-                        data = null,
                     )
                 }
                 is Resource.Success -> {
-                    val posts = ArrayList<Post>()
-                    it.data?.forEach { docs ->
-                        posts.add(
-                            docs.toObject<Post>()
-                        )
-                        Log.e("postsSize", posts.size.toString())
-
-                    }
-
-                    feedState = feedState.copy(
+                    locationState = locationState.copy(
+                        location = result.data,
                         loading = false,
-                        error = null,
-                        data = posts
+                        error = null
                     )
                 }
             }
+
         }
+
     }
 
-    fun getUserFromId(id: String?): User {
-        var user = User()
-        viewModelScope.launch {
-            when (val result = repo.getUserData(id)) {
-                is Resource.Error -> {
+    private fun getLastKnownPosition() = viewModelScope.launch {
+        val location = locationTracker.getCurrentLocation()
 
-                }
-                is Resource.Loading -> {
-                    TODO()
-                }
-                is Resource.Success -> {
-                    result.data?.let {
-                        user = it
-                    }
-                }
-            }
-
+        location?.let {
+            lastKnownPosition = it
         }
-        return user
+
+    }
+
+
+    fun getPLace() = viewModelScope.launch {
+        val result = locationTracker.getCurrentPlace()
+
+        when (result) {
+            is Resource.Error -> {
+                Log.e("error fetching place", result.message.toString())
+            }
+            is Resource.Loading -> {
+
+                Log.e("Place", "Loading...")
+            }
+            is Resource.Success -> {
+                result.data?.let {
+
+                    val placeResult = it.placeLikelihoods[0].place
+
+                    placeResult.name?.let {
+
+                        place = it
+                        Log.e("place", it)
+
+                    }
+
+                }
+
+
+            }
+        }
     }
 }

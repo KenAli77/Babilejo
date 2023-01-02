@@ -14,17 +14,17 @@ fun OneTapSignIn(
     viewModel: UserAuthViewModel = hiltViewModel(),
     launch: (result: BeginSignInResult) -> Unit
 ) {
-    val context = LocalContext.current
-    when (val oneTapSignInResponse = viewModel.googleLoginState) {
-        is Resource.Loading -> AuthProgressBar()
-        is Resource.Success -> oneTapSignInResponse.data?.let {
-            LaunchedEffect(it) {
-                launch(it)
-            }
-        }
-        is Resource.Error -> LaunchedEffect(Unit) {
-            print(oneTapSignInResponse.message.toString())
-            Toast.makeText(context,oneTapSignInResponse.message,Toast.LENGTH_LONG).show()
-        }
-    }
+//    val context = LocalContext.current
+//    when (val oneTapSignInResponse = viewModel.googleLoginState) {
+//        is Resource.Loading -> AuthProgressBar()
+//        is Resource.Success -> oneTapSignInResponse.data?.let {
+//            LaunchedEffect(it) {
+//                launch(it)
+//            }
+//        }
+//        is Resource.Error -> LaunchedEffect(Unit) {
+//            print(oneTapSignInResponse.message.toString())
+//            Toast.makeText(context,oneTapSignInResponse.message,Toast.LENGTH_LONG).show()
+//        }
+//    }
 }

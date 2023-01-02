@@ -1,6 +1,7 @@
 package devolab.projects.babilejo.ui.authentication
 
 import android.app.Activity
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.IntentSenderRequest
@@ -16,10 +17,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.google.android.gms.auth.api.identity.BeginSignInResult
@@ -46,120 +50,9 @@ fun SignUpScreen(
     var confirmPassword by remember { mutableStateOf("") }
 
     val context = LocalContext.current
+    val state = viewModel.signUpState
 
-    Surface(color = Yellow, modifier = Modifier.fillMaxSize()) {
 
-
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 50.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp),
-            horizontalAlignment = Alignment.Start,
-        ) {
-
-            Spacer(modifier = Modifier.height(80.dp))
-            Heading(text = stringResource(R.string.signup), Modifier.padding(bottom = 40.dp))
-            InputField(
-                input = userName,
-                onValueChange = { userName = it },
-                placeholder = "username",
-                icon = Icons.Rounded.Person,
-                type = KeyboardType.Text
-            )
-
-            InputField(
-                input = eMail,
-                placeholder = stringResource(R.string.email),
-                icon = Icons.Rounded.Mail,
-                onValueChange = { eMail = it },
-                type = KeyboardType.Email
-            )
-            InputField(
-                input = password,
-                placeholder = stringResource(R.string.password),
-                icon = Icons.Rounded.Lock,
-                onValueChange = { password = it },
-                password = true,
-                type = KeyboardType.Password
-            )
-            InputField(
-                input = confirmPassword,
-                onValueChange = { confirmPassword = it },
-                placeholder = "confirm password",
-                icon = Icons.Rounded.Lock,
-                type = KeyboardType.Password,
-                true
-            )
-
-            Spacer(modifier = Modifier.height(20.dp))
-
-            Signup(navigateToHomeScreen = { navController.navigate(Screens.Login.route) })
-
-            RegularButton(
-                text = stringResource(R.string.sign_up),
-                modifier = Modifier.fillMaxWidth(),
-                onClick = {
-                    viewModel.createUser(
-                        userName = userName,
-                        email = eMail,
-                        password = password,
-                        confirmPassword = confirmPassword
-                    )
-                    password = ""
-                    confirmPassword = ""
-                    when (viewModel.signUpState) {
-                        is Resource.Error -> {
-                            Toast.makeText(
-                                context,
-                                viewModel.signUpState.message.toString(),
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-                        is Resource.Loading -> {
-
-                            Toast.makeText(context, "loading..", Toast.LENGTH_SHORT).show()
-                        }
-                        is Resource.Success -> {
-
-                            Toast.makeText(context, "account created!", Toast.LENGTH_SHORT).show()
-                            navController.navigate(Screens.Login.route)
-
-                        }
-                    }
-
-                },
-                backgroundColor = Blue
-            )
-            Text(
-                text = stringResource(R.string.or),
-                fontSize = 18.sp,
-                color = Color.DarkGray.copy(0.7f),
-                modifier = Modifier.align(Alignment.CenterHorizontally)
-            )
-
-            GoogleAuthButton(
-                text = stringResource(R.string.google_login),
-                modifier = Modifier.fillMaxWidth(),
-                textColor = Color.DarkGray.copy(0.5f),
-                onClick = { viewModel.oneTapSignIn() },
-            )
-
-            Spacer(modifier = Modifier.height(5.dp))
-
-            TermsAndCo()
-
-        }
-
-    }
-
-    GoogleLogin(
-        navigateToHomeScreen = { signedIn ->
-            if (signedIn) {
-                navController.navigate(Screens.Home.route)
-            }
-        }
-    )
     val launcher =
         rememberLauncherForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
@@ -180,5 +73,120 @@ fun SignUpScreen(
         launcher.launch(intent)
     }
 
-    OneTapSignIn(launch = { launch(it) })
+    LaunchedEffect(key1 = state.authData, key2 = state.oneTapData, key3 = state.error) {
+        state.authData?.let {
+            if (state.success) {
+                Toast.makeText(context, "Account created successfully!", Toast.LENGTH_SHORT).show()
+                navController.navigate(Screens.Login.route)
+            }
+
+        }
+
+        state.oneTapData?.let {
+            launch(it)
+        }
+
+        state.error?.let {
+            Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+
+        }
+    }
+
+    navController.addOnDestinationChangedListener { _, destination, _ ->
+//        if (destination.route != Screens.Signup.route) {
+//            viewModel.resetState()
+//        }
+        Log.e("signUpScreen", "state reset")
+    }
+    Surface(color = Yellow, modifier = Modifier.fillMaxSize()) {
+
+        if (state.loading) {
+            AuthProgressBar()
+        } else {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 50.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp),
+                horizontalAlignment = Alignment.Start,
+            ) {
+
+                Spacer(modifier = Modifier.height(80.dp))
+                Heading(text = stringResource(R.string.signup), Modifier.padding(bottom = 40.dp))
+                InputField(
+                    input = userName,
+                    onValueChange = { userName = it },
+                    placeholder = "username",
+                    icon = Icons.Rounded.Person,
+                    type = KeyboardType.Text
+                )
+
+                InputField(
+                    input = eMail,
+                    placeholder = stringResource(R.string.email),
+                    icon = Icons.Rounded.Mail,
+                    onValueChange = { eMail = it },
+                    type = KeyboardType.Email
+                )
+                InputField(
+                    input = password,
+                    placeholder = stringResource(R.string.password),
+                    icon = Icons.Rounded.Lock,
+                    onValueChange = { password = it },
+                    password = true,
+                    type = KeyboardType.Password
+                )
+                InputField(
+                    input = confirmPassword,
+                    onValueChange = { confirmPassword = it },
+                    placeholder = "confirm password",
+                    icon = Icons.Rounded.Lock,
+                    type = KeyboardType.Password,
+                    true
+                )
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                Signup(navigateToHomeScreen = { navController.navigate(Screens.Login.route) })
+
+                RegularButton(
+                    text = stringResource(R.string.sign_up),
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = {
+                        viewModel.createUser(
+                            userName = userName,
+                            email = eMail,
+                            password = password,
+                            confirmPassword = confirmPassword
+                        )
+                        password = ""
+                        confirmPassword = ""
+
+
+                    },
+                    backgroundColor = Blue
+                )
+                Text(
+                    text = stringResource(R.string.or),
+                    fontSize = 18.sp,
+                    color = Color.DarkGray.copy(0.7f),
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                )
+
+                GoogleAuthButton(
+                    text = stringResource(R.string.google_login),
+                    modifier = Modifier.fillMaxWidth(),
+                    textColor = Color.DarkGray.copy(0.5f),
+                    onClick = { viewModel.oneTapSignIn() },
+                )
+
+                Spacer(modifier = Modifier.height(5.dp))
+
+                TermsAndCo()
+
+            }
+        }
+    }
+
+
 }
