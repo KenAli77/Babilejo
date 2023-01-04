@@ -19,7 +19,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    val repo: MainRepositoryImpl,
+    private val repo: MainRepositoryImpl,
     val mainViewModel: MainViewModel
 ) : ViewModel() {
 
