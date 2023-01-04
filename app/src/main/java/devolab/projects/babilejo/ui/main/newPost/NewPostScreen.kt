@@ -49,9 +49,9 @@ fun NewPostScreen(navHostController: NavHostController) {
     var userPhotoUrl by remember { mutableStateOf("") }
     var uid by remember { mutableStateOf("") }
     var caption by remember {
-        mutableStateOf<String?>(null)
+        mutableStateOf("")
     }
-    var hintVisibile by remember { mutableStateOf(true) }
+    var hintVisible by remember { mutableStateOf(true) }
     viewModel.user?.let {
         user = it
     }
@@ -243,7 +243,7 @@ fun NewPostScreen(navHostController: NavHostController) {
             ConstraintLayout() {
 
                 TextFieldLarge(
-                    text = caption?:"",
+                    text = caption,
                     onValueChange = { caption = it },
                     keyboardController = keyboardController,
                     modifier = Modifier
@@ -252,7 +252,7 @@ fun NewPostScreen(navHostController: NavHostController) {
                             start.linkTo(parent.start)
                             end.linkTo(parent.end)
                         },
-                    isHintVisible = hintVisibile
+                    isHintVisible = hintVisible
 
                 )
 
@@ -336,7 +336,7 @@ fun NewPostScreen(navHostController: NavHostController) {
     }
 
     LaunchedEffect(key1 = caption){
-        caption?.let { hintVisibile = true }
+        hintVisible = caption.isEmpty()
     }
 
     DisposableEffect(key1 = lifecycleOwner) {

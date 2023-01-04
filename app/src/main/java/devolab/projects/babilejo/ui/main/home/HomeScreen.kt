@@ -1,6 +1,7 @@
 package devolab.projects.babilejo.ui.main.home
 
 import android.Manifest
+import android.content.Intent
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -20,6 +21,7 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.navigation.NavHostController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
+import devolab.projects.babilejo.domain.location.LocationUpdateService
 import devolab.projects.babilejo.navigation.Screens
 import devolab.projects.babilejo.ui.authentication.UserAuthViewModel
 import devolab.projects.babilejo.ui.authentication.components.AuthProgressBar
@@ -43,6 +45,8 @@ fun HomeScreen(navController: NavHostController, authViewModel: UserAuthViewMode
     val viewModel = hiltViewModel<HomeViewModel>()
 
     val state = viewModel.state
+
+    val context = LocalContext.current
 
 
     val openDialog = remember {
@@ -68,6 +72,7 @@ fun HomeScreen(navController: NavHostController, authViewModel: UserAuthViewMode
             if (event == Lifecycle.Event.ON_START && !locationPermissionState.allPermissionsGranted) {
                 locationPermissionState.launchMultiplePermissionRequest()
             }
+
         }
 
         lifecycleOwner.lifecycle.addObserver(observer)
@@ -94,7 +99,6 @@ fun HomeScreen(navController: NavHostController, authViewModel: UserAuthViewMode
         state.data?.let {
             LazyColumn(state = lazyListState, modifier = Modifier.padding(top = 65.dp)) {
 
-
                 items(it) { item ->
 
                     Post(post = item, locality = item.place ?: "")
@@ -108,5 +112,9 @@ fun HomeScreen(navController: NavHostController, authViewModel: UserAuthViewMode
             onPostClick = { navController.navigate(Screens.NewPost.route) }
         )
 
+    }
+
+    if(locationPermissionState.allPermissionsGranted) {
+        context.startService(Intent(context, LocationUpdateService::class.java))
     }
 }

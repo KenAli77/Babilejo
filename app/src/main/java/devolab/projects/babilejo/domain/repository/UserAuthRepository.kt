@@ -22,6 +22,8 @@ interface UserAuthRepository {
 
     suspend fun logOut()
 
-    fun isUserAuthenticated():Boolean
+    fun isUserAuthenticated(callback: (Boolean) -> Unit)
+
+
 
 }

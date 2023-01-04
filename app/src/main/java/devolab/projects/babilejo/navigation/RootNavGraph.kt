@@ -33,11 +33,16 @@ fun RootNavGraph(
 
     var bottomBarState by remember { mutableStateOf(false) }
 
-    val startDestination = if (userViewModel.isUserAuthenticated()) {
-        MAIN_ROUTE
-    } else {
-        AUTH_ROUTE
+    var startDestination by remember { mutableStateOf<String?>(null) }
+
+    userViewModel.isUserAuthenticated?.let { authenticated ->
+        startDestination = if (authenticated) {
+            MAIN_ROUTE
+        } else {
+            AUTH_ROUTE
+        }
     }
+
     Log.e("rootNav", "composing")
     val navBackStackEntry by navController.currentBackStackEntryAsState()
 
@@ -67,24 +72,26 @@ fun RootNavGraph(
         } else {
             PaddingValues(0.dp)
         }
-        NavHost(
-            navController = navController,
-            startDestination = startDestination,
-            route = ROOT_ROUTE,
-            modifier = Modifier.padding(paddingValues)
-        ) {
-            authNavGraph(
-                navController = navController, userViewModel = userViewModel
-            )
+        startDestination?.let { it1 ->
+            NavHost(
+                navController = navController,
+                startDestination = it1,
+                route = ROOT_ROUTE,
+                modifier = Modifier.padding(paddingValues)
+            ) {
+                authNavGraph(
+                    navController = navController, userViewModel = userViewModel
+                )
 
-            mainNavGraph(
-                exploreViewModel = exploreViewModel,
-                userAuthViewModel = userViewModel,
-                navController = navController
-            )
+                mainNavGraph(
+                    exploreViewModel = exploreViewModel,
+                    userAuthViewModel = userViewModel,
+                    navController = navController
+                )
 
 
-        }
+            }
+        }?:SplashScreen()
 
     }
 

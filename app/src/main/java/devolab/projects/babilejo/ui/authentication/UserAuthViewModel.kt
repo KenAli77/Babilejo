@@ -23,13 +23,21 @@ import javax.inject.Inject
 class UserAuthViewModel @Inject constructor(
     private val repo: UserAuthRepositoryImpl,
     val oneTapClient: SignInClient,
-    private val userProfileRepo: MainRepositoryImpl
 ) : ViewModel() {
 
     var authState by mutableStateOf(AuthState())
         private set
 
     var signUpState by mutableStateOf(AuthState())
+
+    var isUserAuthenticated by mutableStateOf<Boolean?>(null)
+
+    init {
+
+        repo.isUserAuthenticated {
+            isUserAuthenticated = it
+        }
+    }
 
     fun logInUser(email: String, password: String) =
         viewModelScope.launch {
@@ -68,9 +76,6 @@ class UserAuthViewModel @Inject constructor(
 
         }
 
-    fun isUserAuthenticated(): Boolean {
-        return repo.isUserAuthenticated()
-    }
 
     fun createUser(
         email: String,

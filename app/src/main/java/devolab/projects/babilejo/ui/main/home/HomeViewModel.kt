@@ -12,16 +12,22 @@ import devolab.projects.babilejo.domain.model.Post
 import devolab.projects.babilejo.domain.model.Resource
 import devolab.projects.babilejo.ui.main.MainViewModel
 import devolab.projects.babilejo.ui.main.home.state.HomeState
+import devolab.projects.babilejo.util.toLocation
 import kotlinx.coroutines.launch
 import java.util.ArrayList
 import javax.inject.Inject
 
 @HiltViewModel
-class HomeViewModel @Inject constructor(val repo: MainRepositoryImpl,val mainViewModel: MainViewModel) : ViewModel() {
+class HomeViewModel @Inject constructor(
+    val repo: MainRepositoryImpl,
+    val mainViewModel: MainViewModel
+) : ViewModel() {
 
     var state by mutableStateOf(HomeState())
 
     var location by mutableStateOf(mainViewModel.locationState)
+
+    var range by mutableStateOf(800f)
 
     init {
         getPosts()
@@ -60,10 +66,29 @@ class HomeViewModel @Inject constructor(val repo: MainRepositoryImpl,val mainVie
 
                     }
 
+                    val postFiltered = posts.filter { post ->
+                        var distance = 0f
+                        var postLocation = post.location?.toLocation()
+
+                        var currentLocation = mainViewModel.liveLocation
+
+                        while (postLocation == null || currentLocation == null) {
+                            postLocation = post.location?.toLocation()
+                            currentLocation = mainViewModel.liveLocation
+                        }
+
+                        distance = postLocation.distanceTo(currentLocation)
+
+                        distance <= range
+
+                    }
+
+                    val postSorted = postFiltered.sortedByDescending { it.timeStamp }
+
                     state = state.copy(
                         loading = false,
                         error = null,
-                        data = posts.sortedByDescending { it.timeStamp }
+                        data = postSorted
                     )
                 }
             }
@@ -75,7 +100,6 @@ class HomeViewModel @Inject constructor(val repo: MainRepositoryImpl,val mainVie
         // remove observer
         super.onCleared()
     }
-
 
 
 }

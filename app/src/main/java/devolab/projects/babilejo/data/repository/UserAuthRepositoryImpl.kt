@@ -1,5 +1,6 @@
 package devolab.projects.babilejo.data.repository
 
+import android.content.Context
 import android.util.Log
 import com.google.android.gms.auth.api.Auth
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
@@ -7,6 +8,7 @@ import com.google.android.gms.auth.api.identity.SignInClient
 import com.google.firebase.auth.*
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
+import devolab.projects.babilejo.domain.model.OnlineStatus
 import devolab.projects.babilejo.domain.model.Resource
 import devolab.projects.babilejo.domain.model.User
 import devolab.projects.babilejo.domain.repository.UserAuthRepository
@@ -14,7 +16,9 @@ import devolab.projects.babilejo.util.*
 import devolab.projects.babilejo.util.SIGN_IN_REQUEST
 import devolab.projects.babilejo.util.SIGN_UP_REQUEST
 import devolab.projects.babilejo.util.USERS
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Named
 
@@ -28,19 +32,24 @@ class UserAuthRepositoryImpl @Inject constructor(
     private val db: FirebaseFirestore
 ) : UserAuthRepository {
 
-    override fun isUserAuthenticated(): Boolean {
-       var loggedIn = false
-        auth.addAuthStateListener{
-          loggedIn =   it.currentUser != null
+    private val TAG = "UserAuthRepositoryImpl"
+
+    override fun isUserAuthenticated(callback: (Boolean) -> Unit) {
+
+        auth.addAuthStateListener {
+            callback(it.currentUser != null)
         }
 
-        return loggedIn
     }
 
     override suspend fun oneTapSignInWithGoogle(): OneTapLoginResponse {
         return try {
             val signInResult = oneTapClient.beginSignIn(signInRequest).await()
+
+            updateUserOnlineStatus(true)
+
             Resource.Success(signInResult)
+
         } catch (e: Exception) {
             try {
                 val signUpResult = oneTapClient.beginSignIn(signUpRequest).await()
@@ -61,6 +70,10 @@ class UserAuthRepositoryImpl @Inject constructor(
                 addUserToFirestore(user!!)
             }
 
+            authResult.user?.let {
+                updateUserOnlineStatus(true)
+            }
+
             Resource.Success(authResult)
         } catch (e: Exception) {
             Resource.Error(e.localizedMessage.toString())
@@ -71,15 +84,15 @@ class UserAuthRepositoryImpl @Inject constructor(
         userName: String,
         userEmailAddress: String,
         userLoginPassword: String,
-        confirmPassword:String,
+        confirmPassword: String,
     ): AuthResponse {
         return try {
 
-            if(confirmPassword!=userLoginPassword){
-               return Resource.Error("passwords are not matching")
+            if (confirmPassword != userLoginPassword) {
+                return Resource.Error("passwords are not matching")
 
             }
-            if(userName.isEmpty() || userEmailAddress.isEmpty()) {
+            if (userName.isEmpty() || userEmailAddress.isEmpty()) {
                 return Resource.Error("please all required fields")
             }
             val registrationResult =
@@ -87,7 +100,7 @@ class UserAuthRepositoryImpl @Inject constructor(
                     .await()
 
             val user = User(
-                uid = auth.currentUser?.uid ,
+                uid = auth.currentUser?.uid,
                 userName = userName,
                 userEmail = userEmailAddress,
                 displayName = auth.currentUser?.displayName,
@@ -107,7 +120,11 @@ class UserAuthRepositoryImpl @Inject constructor(
         return try {
             val loginResult = auth.signInWithEmailAndPassword(email, password).await()
             Log.e("login", "logged in user ${loginResult.user?.uid}")
+            loginResult.user?.let {
+                updateUserOnlineStatus(true)
+            }
             Resource.Success(loginResult)
+
         } catch (e: Exception) {
             e.printStackTrace()
             Resource.Error(e.message.toString())
@@ -115,12 +132,66 @@ class UserAuthRepositoryImpl @Inject constructor(
     }
 
     override suspend fun logOut() {
-        Log.e("user1",auth.currentUser?.uid.toString())
-        Log.e("user1",auth.uid.toString())
+
+        updateUserOnlineStatus(false)
         auth.signOut()
         oneTapClient.signOut()
-        Log.e("user",auth.currentUser?.uid.toString())
-        Log.e("user",auth.uid.toString())
+
+    }
+
+    private suspend fun updateUserOnlineStatus(active: Boolean) {
+
+        withContext(Dispatchers.IO) {
+
+            auth.currentUser?.let { user ->
+
+                val doc = db.collection("online_status").document(user.uid)
+                val docRef = doc.get().await()
+
+                if (docRef.exists()) {
+                    if (active) {
+
+                        doc.update(
+                            mapOf(
+                                "online" to true,
+                                "lastOnline" to null
+                            )
+                        ).await()
+
+                    } else {
+                        Log.e(TAG, "online status $active")
+                        doc.update(
+                            mapOf(
+                                "online" to false,
+                                "lastOnline" to System.currentTimeMillis()
+                            )
+                        )
+                    }
+                } else {
+
+                    val status: OnlineStatus =
+                        if (active) {
+                            OnlineStatus(
+                                online = true,
+                                lastOnline = null
+                            )
+
+                        } else {
+
+                            OnlineStatus(
+                                online = false,
+                                lastOnline = System.currentTimeMillis()
+                            )
+
+                        }
+
+                    doc.set(status).await()
+                }
+
+            }
+
+        }
+
     }
 
 
