@@ -29,17 +29,13 @@ class ExploreViewModel @Inject constructor(
     var currentPosition by mutableStateOf(MainViewModel.LocationState())
         private set
 
+    var location = mainViewModel.liveLocation
+
     var lastKnownPosition by mutableStateOf(Location(""))
 
     var state by mutableStateOf(ExploreState())
         private set
 
-
-    init {
-        viewModelScope.launch {
-           fetchPosition()
-        }
-    }
 
     fun getLocalityFromLocation(location: devolab.projects.babilejo.domain.model.Location): String {
         val geocoder = Geocoder(app, Locale.ENGLISH)
@@ -54,13 +50,23 @@ class ExploreViewModel @Inject constructor(
             loading = true
         )
 
+        currentPosition.error?.let {
+            state = state.copy(
+                error = it,
+                loading = false,
+                currentLocation = null
+            )
+        }
         currentPosition.location?.let { location->
             state = state.copy(
                 currentLocation = location.toLocation(),
-                lastKnownLocation = lastKnownPosition.toLocation()
+                lastKnownLocation = lastKnownPosition.toLocation(),
+                error = null,
+                loading = false
 
             )
         }
+
 
     }
 

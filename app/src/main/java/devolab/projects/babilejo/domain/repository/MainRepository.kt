@@ -1,6 +1,6 @@
 package devolab.projects.babilejo.domain.repository
 
-import android.net.Uri
+import android.graphics.Bitmap
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.firestore.QuerySnapshot
 import devolab.projects.babilejo.domain.model.Post
@@ -20,7 +20,7 @@ interface MainRepository {
 
     suspend fun revokeAccess(): RevokeAccessResponse
 
-    suspend fun addPost(post: Post,imageUri: Uri?=null)
+    suspend fun addPost(post: Post, imageBitmap: Bitmap?=null):Resource<Void>
 
     suspend fun getPosts(): MutableLiveData<Resource<QuerySnapshot>>
 }

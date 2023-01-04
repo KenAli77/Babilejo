@@ -63,7 +63,7 @@ class HomeViewModel @Inject constructor(val repo: MainRepositoryImpl,val mainVie
                     state = state.copy(
                         loading = false,
                         error = null,
-                        data = posts
+                        data = posts.sortedByDescending { it.timeStamp }
                     )
                 }
             }

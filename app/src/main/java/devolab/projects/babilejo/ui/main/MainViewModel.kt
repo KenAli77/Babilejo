@@ -7,6 +7,7 @@ import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.firestore.ktx.toObject
@@ -19,6 +20,8 @@ import devolab.projects.babilejo.domain.model.Resource
 import devolab.projects.babilejo.domain.model.User
 import devolab.projects.babilejo.util.UserDataResponse
 import devolab.projects.babilejo.util.toLocation
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.launch
 import java.util.*
 import javax.inject.Inject
@@ -39,11 +42,12 @@ class MainViewModel @Inject constructor(
     var locationState by mutableStateOf(LocationState())
         private set
 
+    val liveLocation = MutableLiveData<Location>()
+
     var lastKnownPosition by mutableStateOf(Location(""))
 
     var userDataState by mutableStateOf<UserDataResponse>(Resource.Success(null))
 
-    var homeState by mutableStateOf(HomeState())
 
     var place by mutableStateOf("")
 
@@ -62,8 +66,9 @@ class MainViewModel @Inject constructor(
 
 
     private fun getPositionUpdates() = viewModelScope.launch {
-        locationTracker.getLocationUpdates().collect { result ->
-
+        locationTracker.getLocationUpdates().onCompletion {
+            cancel()
+        }.collect { result ->
             locationState = locationState.copy(
                 loading = true
             )
@@ -71,6 +76,8 @@ class MainViewModel @Inject constructor(
             when (result) {
 
                 is Resource.Error -> {
+                    Log.e("MainViewModel","location: ${result.message}")
+
                     locationState = locationState.copy(
                         location = null,
                         error = result.message,
@@ -83,11 +90,14 @@ class MainViewModel @Inject constructor(
                     )
                 }
                 is Resource.Success -> {
+                    Log.e("MainViewModel","location: ${result.data}")
                     locationState = locationState.copy(
                         location = result.data,
                         loading = false,
                         error = null
                     )
+
+                    liveLocation.postValue(result.data)
                 }
             }
 
@@ -134,4 +144,5 @@ class MainViewModel @Inject constructor(
             }
         }
     }
+
 }

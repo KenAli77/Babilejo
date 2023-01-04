@@ -24,7 +24,7 @@ fun LogoutDialog(openDialog: MutableState<Boolean>, logout: () -> Unit) {
         AlertDialog(
             onDismissRequest = { showDialog.value = false },
             title = { Text("Log out", fontSize = 25.sp) },
-            text = { Text("Are you sure you want to log out?",fontSize = 20.sp) },
+            text = { Text("Are you sure you want to log out?", fontSize = 20.sp) },
             buttons = {
                 Row(
                     modifier = Modifier
@@ -38,6 +38,48 @@ fun LogoutDialog(openDialog: MutableState<Boolean>, logout: () -> Unit) {
                     })
                     Text(text = "log out", color = Color.Red, modifier = Modifier.clickable {
                         logout()
+                        showDialog.value = false
+                    })
+
+                }
+
+            }
+        )
+    }
+
+}
+
+@Composable
+fun BasicAlertDialog(
+    openDialog: MutableState<Boolean>,
+    onAction: () -> Unit,
+    text: String,
+    title: String,
+    actionText:String,
+
+) {
+    // Create a state variable to track the visibility of the alert dialog
+    val showDialog by remember { mutableStateOf(openDialog) }
+
+    // When the showDialog state variable is true, show the alert dialog
+    if (showDialog.value) {
+        AlertDialog(
+            onDismissRequest = { showDialog.value = false },
+            title = { Text(title, fontSize = 20.sp) },
+            text = { Text(text, fontSize = 18.sp) },
+            buttons = {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(20.dp),
+                    horizontalArrangement = Arrangement.spacedBy(20.dp, alignment = Alignment.End),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(text = "dismiss", color = Color.Blue, modifier = Modifier.clickable {
+                        showDialog.value = false
+                    })
+                    Text(text = actionText, color = Color.Blue, modifier = Modifier.clickable {
+                        onAction()
                         showDialog.value = false
                     })
 

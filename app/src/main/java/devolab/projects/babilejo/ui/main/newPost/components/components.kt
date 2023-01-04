@@ -1,6 +1,7 @@
 package devolab.projects.babilejo.ui.main.newPost.components
 
 import android.graphics.Bitmap
+import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
@@ -21,6 +22,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -31,6 +33,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.skydoves.landscapist.ImageOptions
+import com.skydoves.landscapist.coil.CoilImage
 import com.skydoves.landscapist.glide.GlideImage
 import devolab.projects.babilejo.ui.theme.Yellow
 
@@ -41,22 +45,34 @@ fun TextFieldLarge(
     text: String,
     onValueChange: (String) -> Unit,
     keyboardController: SoftwareKeyboardController?,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    hint: String = "Type in something..",
+    isHintVisible: Boolean = true
 ) {
 
-    BasicTextField(
-        value = text,
-        onValueChange = { onValueChange(it) },
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(end = 10.dp, start = 10.dp)
-            .focusable(),
-        keyboardOptions = KeyboardOptions(
-            keyboardType = KeyboardType.Text
-        ),
-        textStyle = MaterialTheme.typography.body1,
-        cursorBrush = Brush.linearGradient(listOf(Color.Black, Yellow)),
-    )
+    Box(
+        modifier = modifier.padding(end = 10.dp, start = 10.dp)
+    ) {
+
+        BasicTextField(
+            value = text,
+            onValueChange = { onValueChange(it) },
+            modifier = modifier
+                .fillMaxWidth()
+                .focusable(),
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Text
+            ),
+            textStyle = MaterialTheme.typography.body1,
+            cursorBrush = Brush.linearGradient(listOf(Color.Black, Yellow)),
+        )
+        if (isHintVisible) {
+            Text(text = hint, color = Color.DarkGray.copy(0.7f))
+        }
+
+
+    }
+
 }
 
 @Composable
@@ -72,12 +88,15 @@ fun NewPostHeader(
             .height(65.dp),
         horizontalArrangement = Arrangement.spacedBy(5.dp)
     ) {
-        GlideImage(
-            imageModel = photoUrl, contentDescription = null,
+        CoilImage(
+            imageModel = { photoUrl },
+            imageOptions = ImageOptions(
+                alignment = Alignment.Center,
+                contentScale = ContentScale.Crop
+            ),
             modifier = Modifier
                 .clip(CircleShape)
                 .size(60.dp),
-            contentScale = ContentScale.Crop
         )
         Column(
             modifier = Modifier.height(60.dp),
@@ -164,8 +183,8 @@ fun ImageContainer(
             .padding(horizontal = 5.dp)
             .clip(RoundedCornerShape(5.dp))
     ) {
-        GlideImage(
-            imageModel = image,
+        CoilImage(
+            imageModel = { image },
         )
         MediaActionBar(
             onEdit = { onEdit() },

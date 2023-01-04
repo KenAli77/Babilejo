@@ -24,7 +24,6 @@ import devolab.projects.babilejo.ui.main.explore.ExploreViewModel
 import kotlinx.coroutines.launch
 
 @SuppressLint("CoroutineCreationDuringComposition")
-@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun RootNavGraph(
     navController: NavHostController,
@@ -32,21 +31,6 @@ fun RootNavGraph(
     exploreViewModel: ExploreViewModel = viewModel()
 ) {
 
-    val coroutineScope = rememberCoroutineScope()
-    val context = LocalContext.current
-    val locationPermissionState = rememberMultiplePermissionsState(
-        listOf(
-            Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION
-        )
-
-    )
-
-    if (!locationPermissionState.allPermissionsGranted) {
-        coroutineScope.launch {
-            locationPermissionState.launchMultiplePermissionRequest()
-
-        }
-    }
     var bottomBarState by remember { mutableStateOf(false) }
 
     val startDestination = if (userViewModel.isUserAuthenticated()) {

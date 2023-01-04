@@ -3,6 +3,8 @@ package devolab.projects.babilejo.ui.main.explore
 import android.widget.Toast
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -19,15 +21,20 @@ fun ExploreScreen(navController: NavHostController) {
     val context = LocalContext.current
 
     LaunchedEffect(key1 = currentPosition.error) {
-        Toast.makeText(context, "error fetching location", Toast.LENGTH_SHORT).show()
+        currentPosition.error?.let {
+            Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+        }
     }
 
     if (currentPosition.loading) {
         AuthProgressBar()
     }
 
-    currentPosition.location?.let {
+    val location by viewModel.location.observeAsState()
+
+    location?.let {
         ExploreMapView(location = it, lastKnownPosition = lastKnownPosition)
+
     }
 
 

@@ -108,7 +108,7 @@ class DefaultLocationTracker @Inject constructor(
         val hasPermissionFineLocation = ContextCompat.checkSelfPermission(
             application, Manifest.permission.ACCESS_FINE_LOCATION
         ) == PackageManager.PERMISSION_GRANTED
-
+        var locationCallback:LocationCallback? = null
         if (hasPermissionCoarseLocation && hasPermissionFineLocation && (isGpsEnabled || isNetworkEnabled)) {
 
             locationRequest = LocationRequest.Builder(
@@ -116,7 +116,7 @@ class DefaultLocationTracker @Inject constructor(
                 1000,
             ).build()
 
-            val locationCallback = object : LocationCallback() {
+            locationCallback = object : LocationCallback() {
                 override fun onLocationResult(result: LocationResult) {
                     super.onLocationResult(result)
                     // Update the user's location
@@ -133,14 +133,17 @@ class DefaultLocationTracker @Inject constructor(
                 launch { send(Resource.Error(it.message.toString())) }
             }
 
-            awaitClose {
-                fusedLocationProviderClient.removeLocationUpdates(locationCallback)
-            }
+
 
         } else {
             send(Resource.Error("permissions not granted"))
         }
 
+        awaitClose {
+            
+            locationCallback?.let { fusedLocationProviderClient.removeLocationUpdates(it) }
+            channel.close()
+        }
     }
 
     @SuppressLint("MissingPermission")

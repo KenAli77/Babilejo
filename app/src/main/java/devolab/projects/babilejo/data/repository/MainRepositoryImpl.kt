@@ -1,6 +1,6 @@
 package devolab.projects.babilejo.data.repository
 
-import android.net.Uri
+import android.graphics.Bitmap
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.google.android.gms.auth.api.identity.SignInClient
@@ -18,10 +18,10 @@ import devolab.projects.babilejo.domain.repository.MainRepository
 import devolab.projects.babilejo.domain.model.Resource
 import devolab.projects.babilejo.util.*
 import devolab.projects.babilejo.util.USERS
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import kotlinx.coroutines.tasks.await
-import kotlinx.coroutines.withContext
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
 import java.util.UUID
 import javax.inject.Inject
 
@@ -83,36 +83,78 @@ class MainRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun addPost(post: Post, imageUri: Uri?) {
-        withContext(Dispatchers.IO) {
-            try {
-                imageUri?.let {
-                    val photoId = UUID.randomUUID()
-                    val photoRef = storage.reference.child("photos/${photoId}")
+    @OptIn(ExperimentalCoroutinesApi::class)
+    override suspend fun addPost(post: Post, imageBitmap: Bitmap?): Resource<Void> =
+        suspendCancellableCoroutine { cont ->
 
-                    val result = photoRef.putFile(imageUri).await()
-                    if (result.task.isSuccessful) {
-                        val photoUrl = photoRef.downloadUrl.result
-                        post.id?.let { postId ->
-                            post.photoUrl = photoUrl.toString()
+            imageBitmap?.let { bitmap ->
+                val photoId = UUID.randomUUID()
+                val photoRef = storage.reference.child("photos/${photoId}")
 
-                            firestore.collection("posts_global").document(postId)
-                                .set(post).await()
+                val outputStream = ByteArrayOutputStream()
+
+                imageBitmap.compress(Bitmap.CompressFormat.JPEG, 50, outputStream)
+
+                outputStream.writeTo(outputStream)
+
+                val inputStream = ByteArrayInputStream(outputStream.toByteArray())
+
+                val result = photoRef.putStream(inputStream)
+
+                result.addOnCompleteListener { imageLoading ->
+
+                    if (imageLoading.isSuccessful) {
+                        val photoUrl = photoRef.downloadUrl
+
+                        photoUrl.addOnCompleteListener {
+
+                            if (it.isSuccessful) {
+                                post.photoUrl = it.result.toString()
+
+                                val addPostDocument =
+                                    firestore.collection("posts_global").document(post.id!!)
+                                        .set(post)
+
+                                addPostDocument.addOnCompleteListener {
+                                    if (it.isSuccessful) {
+                                        cont.resume(Resource.Success(it.result)) { cause ->
+                                            Resource.Error(cause.message!!, null)
+                                        }
+                                    }
+
+                                    if (it.isCanceled) {
+                                        cont.cancel(it.exception)
+                                    }
+                                }
+
+                            } else {
+                                cont.cancel(it.exception)
+                            }
 
                         }
-                    }
 
-                } ?: post.id?.let {
-                    firestore.collection("posts_global").document(it)
-                        .set(post).await()
+                    }
                 }
 
-            } catch (e: Exception) {
-                e.printStackTrace()
-                print(e.message.toString())
+                outputStream.close()
+                inputStream.close()
+
+            } ?: post.id?.let {
+                Log.e("postId", it)
+                val addPostDocument = firestore.collection("posts_global").document(it)
+                    .set(post)
+
+                addPostDocument.addOnCompleteListener { result ->
+                    if (result.isSuccessful) {
+                        cont.resume(Resource.Success(result.result)) { cause ->
+                            Resource.Error(cause.message!!, null)
+                        }
+                    }
+                }
             }
+
+
         }
-    }
 
     override suspend fun getPosts(): MutableLiveData<Resource<QuerySnapshot>> {
         val result = MutableLiveData<Resource<QuerySnapshot>>()

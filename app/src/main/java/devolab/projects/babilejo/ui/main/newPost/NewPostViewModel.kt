@@ -1,6 +1,6 @@
 package devolab.projects.babilejo.ui.main.newPost
 
-import android.location.Location
+import android.graphics.Bitmap
 import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.getValue
@@ -11,7 +11,9 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import devolab.projects.babilejo.data.repository.MainRepositoryImpl
 import devolab.projects.babilejo.domain.model.Post
+import devolab.projects.babilejo.domain.model.Resource
 import devolab.projects.babilejo.ui.main.MainViewModel
+import devolab.projects.babilejo.ui.main.newPost.state.NewPostState
 import devolab.projects.babilejo.util.toLocation
 import kotlinx.coroutines.launch
 import java.util.*
@@ -28,22 +30,24 @@ class NewPostViewModel @Inject constructor(
     var place by mutableStateOf(mainViewModel.place)
         private set
 
+    var state by mutableStateOf(NewPostState())
+
     init {
         mainViewModel.getPLace()
     }
 
     fun addPost(
-        caption: String,
+        caption: String?,
         photoUrl: Uri?,
-        imageUri: Uri? = null,
+        imageBitmap: Bitmap? = null,
     ) =
         viewModelScope.launch {
 
             val postId = UUID.randomUUID().toString()
             user?.let { user ->
-                Log.e("newPost","user: ${user.userName}")
+                Log.e("newPost", "user: ${user.userName}")
                 currentLocation?.let { location ->
-                    Log.e("newPost","location: $location")
+                    Log.e("newPost", "location: $location")
 
                     val post = Post(
                         id = postId,
@@ -57,7 +61,31 @@ class NewPostViewModel @Inject constructor(
                         userName = user.userName,
                         place = place
                     )
-                    repo.addPost(post, imageUri)
+                    val result = repo.addPost(post, imageBitmap)
+
+                    when (result) {
+                        is Resource.Error -> {
+                            state = state.copy(
+                                success = false,
+                                loading = false,
+                                error = result.message
+                            )
+                        }
+                        is Resource.Loading -> {
+                            state = state.copy(
+                                loading = true,
+                                success = false,
+                                error = null
+                            )
+                        }
+                        is Resource.Success -> {
+                            state = state.copy(
+                                success = true,
+                                loading = false,
+                                error = null
+                            )
+                        }
+                    }
                 }
 
 

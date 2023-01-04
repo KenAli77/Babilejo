@@ -24,44 +24,6 @@ import kotlinx.coroutines.launch
 @SuppressLint("RememberReturnType")
 @Composable
 fun MainMapView(currentLocation: Location, lastKnownLocation: Location) {
-    Log.e("location","${lastKnownLocation.latitude} ${lastKnownLocation.longitude}")
-    val positionState = rememberCameraPositionState(
-        init = {
-            CameraPosition(
-                LatLng(currentLocation.latitude, currentLocation.longitude),
-                14f,
-                0f,
-                0f
-            )
-        }
-    )
+    Log.e("location", "${lastKnownLocation.latitude} ${lastKnownLocation.longitude}")
 
-    val scope = rememberCoroutineScope()
-
-    val mapLoaded = remember{ mutableStateOf(false) }
-
-    GoogleMap(
-        modifier = Modifier.fillMaxSize(),
-        properties = MapProperties(isMyLocationEnabled = true),
-        uiSettings = MapUiSettings(zoomControlsEnabled = false),
-        cameraPositionState = positionState,
-        onMapLoaded = {
-            scope.launch {
-                    positionState.animate(
-                        update = CameraUpdateFactory.newCameraPosition(
-                            CameraPosition(
-                                LatLng(currentLocation.latitude, currentLocation.longitude),
-                                14.0f,
-                                0f,
-                                0f
-                            )
-                        )
-                    )
-            }
-        },
-
-
-    ) {
-
-    }
 }

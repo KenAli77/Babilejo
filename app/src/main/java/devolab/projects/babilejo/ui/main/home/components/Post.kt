@@ -1,12 +1,14 @@
 package devolab.projects.babilejo.ui.main.home.components
 
 import android.util.Log
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
@@ -22,17 +24,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.font.FontLoadingStrategy.Companion.Async
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.skydoves.landscapist.glide.GlideImage
+import com.skydoves.landscapist.ImageOptions
+import com.skydoves.landscapist.coil.CoilImage
 import devolab.projects.babilejo.R
 import devolab.projects.babilejo.domain.model.Post
-import devolab.projects.babilejo.domain.model.User
 import devolab.projects.babilejo.ui.theme.Yellow
 import devolab.projects.babilejo.util.getTimeAgo
 
@@ -103,13 +107,34 @@ fun Post(post: Post, locality: String) {
             Caption(Modifier.padding(horizontal = 10.dp), text = caption)
 
             post.photoUrl?.let {
-                GlideImage(
-                    imageModel = it,
-                    contentScale = ContentScale.FillWidth,
-                    contentDescription = null,
-                    modifier = Modifier.heightIn(max = 500.dp).height(intrinsicSize = IntrinsicSize.Min),
 
-                    )
+                Log.e("PostPhoto", it)
+
+
+                CoilImage(
+                    imageModel = { it },
+                    modifier = Modifier
+                        .heightIn(max = 500.dp)
+                        .height(intrinsicSize = IntrinsicSize.Min)
+                        .fillMaxWidth(),
+                    imageOptions = ImageOptions(
+                        contentScale = ContentScale.FillWidth,
+                        alignment = Alignment.Center,
+                    ),
+                    loading = {
+                        Box(modifier = Modifier.fillMaxWidth().height(300.dp)) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.align(Alignment.Center),
+                                color = Yellow
+                            )
+                        }
+                    },
+                    failure = {
+                        Text(text = "couldn't load image")
+                    },
+                )
+
+
             }
 
             PostActionsBar(
@@ -141,17 +166,18 @@ fun PostHeader(
         horizontalArrangement = Arrangement.spacedBy(5.dp)
     ) {
 
-        GlideImage(
-            contentScale = ContentScale.Crop,
-            imageModel = photoUrl,
-            contentDescription = null,
+        CoilImage(
+            imageModel = { photoUrl },
             modifier = Modifier
                 .clip(
                     CircleShape
                 )
                 .size(60.dp),
-
+            imageOptions = ImageOptions(
+                alignment = Alignment.Center,
+                contentScale = ContentScale.Crop,
             )
+        )
         Column(
             verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.Start
         ) {
