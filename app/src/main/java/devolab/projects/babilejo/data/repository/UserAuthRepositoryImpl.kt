@@ -16,9 +16,13 @@ import devolab.projects.babilejo.util.*
 import devolab.projects.babilejo.util.SIGN_IN_REQUEST
 import devolab.projects.babilejo.util.SIGN_UP_REQUEST
 import devolab.projects.babilejo.util.USERS
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Named
 
@@ -34,13 +38,21 @@ class UserAuthRepositoryImpl @Inject constructor(
 
     private val TAG = "UserAuthRepositoryImpl"
 
-    override fun isUserAuthenticated(callback: (Boolean) -> Unit) {
+    override fun isUserAuthenticated(): Flow<Boolean> = callbackFlow {
 
         auth.addAuthStateListener {
-            callback(it.currentUser != null)
+
+            launch {
+                send(it.currentUser != null)
+            }
+
         }
 
+        awaitClose {
+            channel.close()
+        }
     }
+
 
     override suspend fun oneTapSignInWithGoogle(): OneTapLoginResponse {
         return try {

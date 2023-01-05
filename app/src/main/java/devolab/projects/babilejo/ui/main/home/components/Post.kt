@@ -42,7 +42,12 @@ import devolab.projects.babilejo.util.getTimeAgo
 
 
 @Composable
-fun Post(post: Post, locality: String) {
+fun Post(
+    post: Post, locality: String, onLike: () -> Unit = {},
+    onComment: () -> Unit = {},
+    onShare: () -> Unit = {},
+    onLookUp: () -> Unit = {},
+) {
     var userPhotoUrl by remember { mutableStateOf("") }
     var userName by remember { mutableStateOf("") }
     var timeAgo by remember {
@@ -122,7 +127,9 @@ fun Post(post: Post, locality: String) {
                         alignment = Alignment.Center,
                     ),
                     loading = {
-                        Box(modifier = Modifier.fillMaxWidth().height(300.dp)) {
+                        Box(modifier = Modifier
+                            .fillMaxWidth()
+                            .height(300.dp)) {
                             CircularProgressIndicator(
                                 modifier = Modifier.align(Alignment.Center),
                                 color = Yellow
@@ -141,8 +148,13 @@ fun Post(post: Post, locality: String) {
                 Modifier.padding(horizontal = 10.dp),
                 likes = post.likes ?: 0,
                 comments = post.comments?.size ?: 0,
-                shares = post.shares ?: 0
-            )
+                shares = post.shares ?: 0,
+                onComment = {onComment()},
+                onLike = {onLike()},
+                onLookUp = {onLookUp()},
+                onShare = {onShare()},
+
+                )
 
         }
     }
@@ -196,7 +208,11 @@ fun PostActionsBar(
     modifier: Modifier = Modifier,
     likes: Int = 0,
     shares: Int = 0,
-    comments: Int = 0
+    comments: Int = 0,
+    onLike: () -> Unit = {},
+    onComment: () -> Unit = {},
+    onShare: () -> Unit = {},
+    onLookUp: () -> Unit = {},
 ) {
 
     Row(
@@ -212,7 +228,7 @@ fun PostActionsBar(
                 interactionSource = remember { MutableInteractionSource() },
                 role = Role.Button,
                 enabled = true,
-                onClick = {},
+                onClick = { onLike() },
                 indication = rememberRipple(bounded = false, radius = 16.dp)
             )
         )
@@ -232,7 +248,7 @@ fun PostActionsBar(
                 interactionSource = remember { MutableInteractionSource() },
                 role = Role.Button,
                 enabled = true,
-                onClick = {},
+                onClick = { onComment() },
                 indication = rememberRipple(bounded = false, radius = 16.dp)
             )
         )
@@ -252,7 +268,7 @@ fun PostActionsBar(
                 interactionSource = remember { MutableInteractionSource() },
                 role = Role.Button,
                 enabled = true,
-                onClick = {},
+                onClick = { onShare() },
                 indication = rememberRipple(bounded = false, radius = 16.dp)
             )
         )
@@ -275,7 +291,7 @@ fun PostActionsBar(
                 interactionSource = remember { MutableInteractionSource() },
                 role = Role.Button,
                 enabled = true,
-                onClick = {},
+                onClick = { onLookUp() },
                 indication = rememberRipple(bounded = false, radius = 16.dp)
             ),
             tint = Yellow

@@ -1,5 +1,7 @@
 package devolab.projects.babilejo.ui.main.home
 
+import android.location.Location
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -10,9 +12,11 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import devolab.projects.babilejo.data.repository.MainRepositoryImpl
 import devolab.projects.babilejo.domain.model.Post
 import devolab.projects.babilejo.domain.model.Resource
+import devolab.projects.babilejo.domain.model.User
 import devolab.projects.babilejo.ui.main.MainViewModel
 import devolab.projects.babilejo.ui.main.home.state.HomeState
 import devolab.projects.babilejo.util.toLocation
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.ArrayList
 import javax.inject.Inject
@@ -20,25 +24,20 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val repo: MainRepositoryImpl,
-    val mainViewModel: MainViewModel
 ) : ViewModel() {
 
-    var state by mutableStateOf(HomeState())
+    private val TAG = "HomeViewModel"
 
-    var location by mutableStateOf(mainViewModel.locationState)
+    var state by mutableStateOf(HomeState(loading = true))
+
 
     var range by mutableStateOf(800f)
 
-    init {
-        getPosts()
-    }
 
 
-    private fun getPosts() = viewModelScope.launch {
+    fun getPosts(currentLocation: Location,currentUser: User) = viewModelScope.launch {
         val result = repo.getPosts()
-        state = state.copy(
-            loading = true
-        )
+
         result.observeForever {
             when (it) {
                 is Resource.Error -> {
@@ -65,21 +64,29 @@ class HomeViewModel @Inject constructor(
                         )
 
                     }
-
+                    var distance = 0f
                     val postFiltered = posts.filter { post ->
-                        var distance = 0f
-                        var postLocation = post.location?.toLocation()
 
-                        var currentLocation = mainViewModel.liveLocation
+                        val postLocation = post.location?.toLocation()
 
-                        while (postLocation == null || currentLocation == null) {
-                            postLocation = post.location?.toLocation()
-                            currentLocation = mainViewModel.liveLocation
-                        }
+                        Log.e(TAG, "post location: $postLocation")
 
-                        distance = postLocation.distanceTo(currentLocation)
+                        Log.e(TAG, "current location: $currentLocation")
 
-                        distance <= range
+                        distance = postLocation!!.distanceTo(currentLocation)
+
+                        Log.e(TAG, "distance: $distance")
+
+                        distance <= range && post.uid != currentUser.uid
+
+                    }
+                    if (distance == 0f) {
+                        state = state.copy(
+                            loading = false,
+                            error = "Could not load nearby posts",
+                            data = null,
+                        )
+
 
                     }
 
@@ -90,15 +97,10 @@ class HomeViewModel @Inject constructor(
                         error = null,
                         data = postSorted
                     )
+
                 }
             }
         }
-    }
-
-
-    override fun onCleared() {
-        // remove observer
-        super.onCleared()
     }
 
 

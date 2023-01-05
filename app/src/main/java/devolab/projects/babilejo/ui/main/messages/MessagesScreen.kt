@@ -10,9 +10,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import devolab.projects.babilejo.ui.main.MainViewModel
 
 @Composable
-fun MessagesScreen(navController: NavHostController){
+fun MessagesScreen(navController: NavHostController, mainViewModel: MainViewModel){
 
     Surface(modifier = Modifier.fillMaxSize()) {
 

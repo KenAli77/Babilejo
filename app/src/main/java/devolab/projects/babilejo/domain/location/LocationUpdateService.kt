@@ -10,11 +10,10 @@ import devolab.projects.babilejo.data.repository.MainRepositoryImpl
 import devolab.projects.babilejo.domain.model.Resource
 import devolab.projects.babilejo.ui.main.MainViewModel
 import devolab.projects.babilejo.util.toLocation
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.cancellable
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.onCompletion
 import javax.inject.Inject
 
 const val TAG = "LocationUpdateService"
@@ -31,8 +30,6 @@ class LocationUpdateService : Service() {
     @Inject
     lateinit var mainRepo: MainRepositoryImpl
 
-    @Inject
-    lateinit var mainViewModel: MainViewModel
 
     override fun onBind(p0: Intent?): IBinder? {
         return null
@@ -47,18 +44,25 @@ class LocationUpdateService : Service() {
 
         Log.e(TAG, "onStartCommand")
 
+        scope.launch(Dispatchers.IO) {
+            locationTracker.getLocationUpdates().onCompletion { cancel() }.collect() {
 
-        mainViewModel.liveLocation?.let {
+                it.data?.let {
+                    scope.launch {
+                        mainRepo.updateUserLocation(it.toLocation())
 
-            scope.launch {
-                mainRepo.updateUserLocation(it.toLocation())
+                    }
+
+                }
 
             }
+
         }
-
-
         return START_STICKY
     }
 
-
+    override fun onDestroy() {
+        job.cancel()
+        super.onDestroy()
+    }
 }

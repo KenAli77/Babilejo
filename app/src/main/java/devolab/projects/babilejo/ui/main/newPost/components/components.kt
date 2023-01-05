@@ -15,8 +15,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.material.ripple.rememberRipple
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -46,19 +45,24 @@ fun TextFieldLarge(
     onValueChange: (String) -> Unit,
     keyboardController: SoftwareKeyboardController?,
     modifier: Modifier = Modifier,
-    hint: String = "Type in something..",
-    isHintVisible: Boolean = true
+    hint: String = "Type in something.."
 ) {
 
+    var isHintVisible by remember { mutableStateOf(true) }
+
+    LaunchedEffect(key1 = text) {
+        isHintVisible = text.isEmpty()
+    }
+
+
     Box(
-        modifier = modifier.padding(end = 10.dp, start = 10.dp)
+        modifier = modifier
     ) {
 
         BasicTextField(
             value = text,
             onValueChange = { onValueChange(it) },
             modifier = modifier
-                .fillMaxWidth()
                 .focusable(),
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Text
@@ -67,7 +71,7 @@ fun TextFieldLarge(
             cursorBrush = Brush.linearGradient(listOf(Color.Black, Yellow)),
         )
         if (isHintVisible) {
-            Text(text = hint, color = Color.DarkGray.copy(0.7f))
+            Text(text = hint, color = Color.DarkGray.copy(0.7f),modifier=modifier)
         }
 
 

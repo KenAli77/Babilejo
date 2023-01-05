@@ -39,6 +39,7 @@ import devolab.projects.babilejo.ui.theme.Blue
 import devolab.projects.babilejo.ui.theme.Yellow
 import devolab.projects.babilejo.ui.theme.quicksand
 import devolab.projects.babilejo.ui.authentication.components.*
+import devolab.projects.babilejo.ui.main.MainViewModel
 
 
 @Composable
@@ -48,6 +49,7 @@ fun LoginScreen(
 ) {
 
     val state = viewModel.authState
+
     val launcher =
         rememberLauncherForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {

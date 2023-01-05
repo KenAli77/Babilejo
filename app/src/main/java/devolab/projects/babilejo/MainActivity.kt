@@ -30,7 +30,6 @@ class MainActivity : ComponentActivity() {
         setContent {
 
             val userAuthViewModel = hiltViewModel<UserAuthViewModel>()
-            val mainViewModel = hiltViewModel<MainViewModel>()
             BabilejoTheme {
                 navController = rememberNavController()
 

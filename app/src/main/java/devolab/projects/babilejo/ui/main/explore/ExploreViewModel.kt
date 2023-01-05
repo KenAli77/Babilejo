@@ -25,31 +25,17 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ExploreViewModel @Inject constructor(
-    private val mainViewModel: MainViewModel,
     private val app: Application,
 ) : ViewModel() {
 
     private val TAG = "ExploreViewModel"
 
-    var currentPosition by mutableStateOf(MainViewModel.LocationState())
-        private set
-
-    var location = mainViewModel.liveLocation
-
     var usersData = mutableStateListOf<User>()
-
-    var lastKnownPosition by mutableStateOf(Location(""))
 
     var state by mutableStateOf(ExploreState())
         private set
 
-    val users = mainViewModel.users
-
-    init {
-        getUserUpdates()
-    }
-
-    private fun getUserUpdates() {
+    fun getUserUpdates(mainViewModel:MainViewModel) {
 
         viewModelScope.launch {
 

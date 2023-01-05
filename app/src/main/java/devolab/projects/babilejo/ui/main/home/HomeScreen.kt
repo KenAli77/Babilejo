@@ -19,24 +19,26 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.navigation.NavHostController
+import com.airbnb.lottie.compose.*
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
+import devolab.projects.babilejo.R
 import devolab.projects.babilejo.domain.location.LocationUpdateService
 import devolab.projects.babilejo.navigation.Screens
 import devolab.projects.babilejo.ui.authentication.UserAuthViewModel
-import devolab.projects.babilejo.ui.authentication.components.AuthProgressBar
 import devolab.projects.babilejo.ui.authentication.components.LogoutDialog
 import devolab.projects.babilejo.ui.main.MainViewModel
-import devolab.projects.babilejo.ui.main.explore.ExploreViewModel
 import devolab.projects.babilejo.ui.main.home.components.HomeTopBar
 import devolab.projects.babilejo.ui.main.home.components.Post
 import devolab.projects.babilejo.ui.theme.Yellow
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalPermissionsApi::class)
 @Composable
-fun HomeScreen(navController: NavHostController, authViewModel: UserAuthViewModel) {
-
+fun HomeScreen(
+    navController: NavHostController,
+    authViewModel: UserAuthViewModel,
+    mainViewModel: MainViewModel
+) {
 
     val lifecycleOwner = LocalLifecycleOwner.current
 
@@ -48,6 +50,15 @@ fun HomeScreen(navController: NavHostController, authViewModel: UserAuthViewMode
 
     val context = LocalContext.current
 
+    val location by mainViewModel.liveLocation.collectAsState()
+
+    val currentUser = mainViewModel.userData
+
+    location?.let { loc ->
+        currentUser?.let { user ->
+            viewModel.getPosts(loc, user)
+        }
+    }
 
     val openDialog = remember {
         mutableStateOf(false)
@@ -93,7 +104,14 @@ fun HomeScreen(navController: NavHostController, authViewModel: UserAuthViewMode
             .background(Yellow.copy(0.5f)),
     ) {
         if (state.loading) {
-            AuthProgressBar(modifier = Modifier.align(Alignment.Center))
+
+            val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.loading_radar_animation))
+            LottieAnimation(
+                composition = composition,
+                iterations = LottieConstants.IterateForever,
+                modifier = Modifier.align(Alignment.Center)
+            )
+
         }
 
         state.data?.let {
@@ -101,7 +119,13 @@ fun HomeScreen(navController: NavHostController, authViewModel: UserAuthViewMode
 
                 items(it) { item ->
 
-                    Post(post = item, locality = item.place ?: "")
+                    Post(
+                        post = item,
+                        locality = item.place ?: "",
+                        onShare = {},
+                        onLookUp = {},
+                        onLike = {},
+                        onComment = {navController.navigate(Screens.Comment.route)})
                 }
             }
         }
@@ -114,7 +138,7 @@ fun HomeScreen(navController: NavHostController, authViewModel: UserAuthViewMode
 
     }
 
-    if(locationPermissionState.allPermissionsGranted) {
+    if (locationPermissionState.allPermissionsGranted) {
         context.startService(Intent(context, LocationUpdateService::class.java))
     }
 }

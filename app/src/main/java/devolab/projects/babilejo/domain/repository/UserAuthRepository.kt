@@ -4,6 +4,7 @@ import com.google.firebase.auth.AuthCredential
 import devolab.projects.babilejo.util.AuthResponse
 import devolab.projects.babilejo.util.LoginWithGoogleResponse
 import devolab.projects.babilejo.util.OneTapLoginResponse
+import kotlinx.coroutines.flow.Flow
 
 interface UserAuthRepository {
 
@@ -22,7 +23,7 @@ interface UserAuthRepository {
 
     suspend fun logOut()
 
-    fun isUserAuthenticated(callback: (Boolean) -> Unit)
+    fun isUserAuthenticated(): Flow<Boolean>
 
 
 

@@ -13,9 +13,13 @@ import devolab.projects.babilejo.data.repository.UserAuthRepositoryImpl
 import devolab.projects.babilejo.data.repository.MainRepositoryImpl
 import devolab.projects.babilejo.domain.model.Resource
 import devolab.projects.babilejo.ui.authentication.state.AuthState
+import devolab.projects.babilejo.ui.main.MainViewModel
 import devolab.projects.babilejo.util.AuthResponse
 import devolab.projects.babilejo.util.LoginWithGoogleResponse
 import devolab.projects.babilejo.util.OneTapLoginResponse
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -34,9 +38,16 @@ class UserAuthViewModel @Inject constructor(
 
     init {
 
-        repo.isUserAuthenticated {
-            isUserAuthenticated = it
-        }
+     viewModelScope.launch {
+
+         repo.isUserAuthenticated().onCompletion {
+             cancel()
+         }.collect{
+             isUserAuthenticated = it
+
+         }
+     }
+
     }
 
     fun logInUser(email: String, password: String) =
@@ -164,6 +175,7 @@ class UserAuthViewModel @Inject constructor(
             }
         }
 
+
     }
 
 
@@ -225,6 +237,8 @@ class UserAuthViewModel @Inject constructor(
             oneTapData = null
         )
     }
+
+
 }
 
 

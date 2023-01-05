@@ -35,7 +35,6 @@ import kotlinx.coroutines.launch
 
 const val TAG = "ExploreMapView"
 
-@RequiresApi(Build.VERSION_CODES.N)
 @Composable
 fun ExploreMapView(location: Location?, users: SnapshotStateList<User>) {
 

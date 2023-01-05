@@ -103,19 +103,6 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideMainViewModel(
-        repositoryImpl: MainRepositoryImpl,
-        locationTracker: DefaultLocationTracker,
-        app:Application
-    ):MainViewModel = MainViewModel(
-        repo = repositoryImpl,
-        locationTracker = locationTracker,
-        app = app
-    )
-
-
-    @Provides
-    @Singleton
     fun provideUserAuthRepository(
         auth: FirebaseAuth,
         oneTapClient: SignInClient,

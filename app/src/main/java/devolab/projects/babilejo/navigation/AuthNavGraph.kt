@@ -9,6 +9,7 @@ import devolab.projects.babilejo.navigation.Graph.AUTH_ROUTE
 import devolab.projects.babilejo.ui.authentication.LoginScreen
 import devolab.projects.babilejo.ui.authentication.SignUpScreen
 import devolab.projects.babilejo.ui.authentication.UserAuthViewModel
+import devolab.projects.babilejo.ui.main.MainViewModel
 
 fun NavGraphBuilder.authNavGraph(
     navController: NavHostController,

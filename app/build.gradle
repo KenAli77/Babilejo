@@ -114,6 +114,8 @@ dependencies {
     implementation "com.github.skydoves:landscapist-coil:2.1.0"
     implementation "com.github.skydoves:landscapist-placeholder:2.1.0"
 
+    // Lottie animation
+    implementation "com.airbnb.android:lottie-compose:5.2.0"
 
 
     testImplementation 'junit:junit:4.13.2'

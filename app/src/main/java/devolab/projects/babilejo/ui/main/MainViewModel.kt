@@ -2,27 +2,19 @@ package devolab.projects.babilejo.ui.main
 
 import android.app.Application
 import android.location.Location
-import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.*
-import androidx.compose.runtime.snapshots.SnapshotStateList
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.firebase.firestore.ktx.toObject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import devolab.projects.babilejo.data.location.DefaultLocationTracker
 import devolab.projects.babilejo.data.repository.MainRepositoryImpl
-import devolab.projects.babilejo.ui.main.home.state.HomeState
-import devolab.projects.babilejo.domain.model.Post
 import devolab.projects.babilejo.domain.model.Resource
 import devolab.projects.babilejo.domain.model.User
-import devolab.projects.babilejo.util.UserDataResponse
-import devolab.projects.babilejo.util.toLocation
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.launch
-import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
@@ -43,29 +35,49 @@ class MainViewModel @Inject constructor(
     var locationState by mutableStateOf(LocationState())
         private set
 
-    var liveLocation by mutableStateOf<Location?>(null)
-        private set
 
+    var liveLocation = MutableStateFlow<Location?>(null)
+        private set
     var lastKnownPosition by mutableStateOf(Location(""))
 
     var users = mutableStateListOf<User>()
 
-    var userDataState by mutableStateOf<UserDataResponse>(Resource.Success(null))
+    var userData by mutableStateOf<User?>(null)
 
 
     var place by mutableStateOf("")
 
     init {
-        getUserData()
         getLastKnownPosition()
         getPositionUpdates()
         getPLace()
         getUserUpdates()
+        getUserData()
+
+        Log.e(TAG, "user: ${userData?.userName}")
+
     }
 
-    private fun getUserData() = viewModelScope.launch {
-        userDataState = Resource.Loading()
-        userDataState = repo.getUserData()
+    fun getUserData() = viewModelScope.launch {
+        userData = null
+
+        val result = repo.getUserData()
+
+        when (result) {
+            is Resource.Error -> {
+
+            }
+            is Resource.Loading -> {
+
+            }
+            is Resource.Success -> {
+                result.data?.let {
+                    userData = it
+                }
+            }
+        }
+
+
     }
 
     fun getUserUpdates() = repo.getUserUpdates()
@@ -95,14 +107,20 @@ class MainViewModel @Inject constructor(
                     )
                 }
                 is Resource.Success -> {
-                    Log.e(TAG, "location: ${result.data}")
-                    locationState = locationState.copy(
-                        location = result.data,
-                        loading = false,
-                        error = null
-                    )
 
-                    liveLocation = result.data
+                    result.data?.let { data ->
+                        Log.e(TAG, "current location: ${result.data}")
+                        locationState = locationState.copy(
+                            location = data,
+                            loading = false,
+                            error = null
+                        )
+
+                        liveLocation.emit(data)
+
+
+                    }
+
                 }
             }
 
@@ -147,6 +165,12 @@ class MainViewModel @Inject constructor(
 
 
             }
+        }
+    }
+
+    fun logout() {
+        viewModelScope.launch {
+
         }
     }
 

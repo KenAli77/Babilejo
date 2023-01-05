@@ -19,8 +19,7 @@ import devolab.projects.babilejo.util.*
 import devolab.projects.babilejo.util.USERS
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.tasks.await
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
@@ -43,11 +42,14 @@ class MainRepositoryImpl @Inject constructor(
 
     private val userCollection = Firebase.firestore.collection("users")
 
-    override val currentUserId = auth.currentUser?.uid
+    override val currentUser = auth.currentUser
 
     override suspend fun getUserData(uid: String?): UserDataResponse {
+
+
+        val userId = uid?:currentUser?.uid
         return try {
-            val user = db.collection(USERS).document(uid!!).get().await()
+            val user = db.collection(USERS).document(userId!!).get().await()
 
             Log.e("user data", user.toObject<User>()?.userName.toString())
             Resource.Success(user.toObject<User>())
@@ -183,9 +185,9 @@ class MainRepositoryImpl @Inject constructor(
         suspendCancellableCoroutine { cont ->
 
             try {
-                currentUserId?.let {
+                currentUser?.let {
 
-                    userCollection.document(it).update("location", location)
+                    userCollection.document(it.uid).update("location", location)
                         .addOnCompleteListener { task ->
 
                             if (task.isSuccessful) {
@@ -249,7 +251,7 @@ class MainRepositoryImpl @Inject constructor(
     override suspend fun getUserOnlineStatus(uid: String?): Resource<OnlineStatus> =
         suspendCancellableCoroutine { cont ->
 
-            val userId = uid ?: currentUserId
+            val userId = uid ?: currentUser?.uid
             userId?.let {
                 firestore.collection("online_status").document(it).get()
                     .addOnCompleteListener { task ->
