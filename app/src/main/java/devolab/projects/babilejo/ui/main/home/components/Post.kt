@@ -1,13 +1,11 @@
 package devolab.projects.babilejo.ui.main.home.components
 
 import android.util.Log
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
@@ -24,10 +22,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.text.font.FontLoadingStrategy.Companion.Async
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -54,6 +50,12 @@ fun Post(
         mutableStateOf("")
     }
     var caption by remember { mutableStateOf("") }
+
+    var liked by remember { mutableStateOf(false) }
+
+    post.likes?.let {  likes ->
+        liked = likes.any { it.userName == userName }
+    }
 
     LaunchedEffect(key1 = post.userName) {
         post.userName?.let {
@@ -127,9 +129,11 @@ fun Post(
                         alignment = Alignment.Center,
                     ),
                     loading = {
-                        Box(modifier = Modifier
-                            .fillMaxWidth()
-                            .height(300.dp)) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(300.dp)
+                        ) {
                             CircularProgressIndicator(
                                 modifier = Modifier.align(Alignment.Center),
                                 color = Yellow
@@ -146,15 +150,17 @@ fun Post(
 
             PostActionsBar(
                 Modifier.padding(horizontal = 10.dp),
-                likes = post.likes ?: 0,
+                likes = post.likes?.size ?: 0,
                 comments = post.comments?.size ?: 0,
                 shares = post.shares ?: 0,
-                onComment = {onComment()},
-                onLike = {onLike()},
-                onLookUp = {onLookUp()},
-                onShare = {onShare()},
+                onComment = { onComment() },
+                onLike = { if(!liked) onLike() },
+                onLookUp = { onLookUp() },
+                onShare = { onShare() },
+                liked = liked
 
-                )
+            )
+
 
         }
     }
@@ -213,7 +219,15 @@ fun PostActionsBar(
     onComment: () -> Unit = {},
     onShare: () -> Unit = {},
     onLookUp: () -> Unit = {},
+    liked: Boolean,
 ) {
+
+    var likeColor by remember { mutableStateOf(Color.Black) }
+
+    if (liked) {
+        likeColor = Color.Red
+
+    }
 
     Row(
         modifier = modifier.fillMaxWidth(),
@@ -228,9 +242,13 @@ fun PostActionsBar(
                 interactionSource = remember { MutableInteractionSource() },
                 role = Role.Button,
                 enabled = true,
-                onClick = { onLike() },
-                indication = rememberRipple(bounded = false, radius = 16.dp)
-            )
+                onClick = {
+                    onLike()
+                    likeColor = Color.Red
+                },
+                indication = rememberRipple(bounded = false, radius = 16.dp),
+            ),
+            tint = likeColor
         )
         if (likes > 0) {
             Text(

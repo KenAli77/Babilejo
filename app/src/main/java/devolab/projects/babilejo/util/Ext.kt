@@ -5,6 +5,7 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.ImageDecoder
+import android.location.Geocoder
 import android.location.Location
 import android.net.Uri
 import android.os.Build
@@ -143,4 +144,25 @@ fun Context.bitmapFromVector( vectorResId: Int): BitmapDescriptor {
 
     // after generating our bitmap we are returning our bitmap.
     return BitmapDescriptorFactory.fromBitmap(bitmap)
+}
+
+
+@Suppress("DEPRECATION")
+fun Geocoder.getAddress(
+    latitude: Double,
+    longitude: Double,
+    address: (android.location.Address?) -> Unit
+) {
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        getFromLocation(latitude, longitude, 1) { address(it.firstOrNull()) }
+        return
+    }
+
+    try {
+        address(getFromLocation(latitude, longitude, 1)?.firstOrNull())
+    } catch(e: Exception) {
+        //will catch if there is an internet problem
+        address(null)
+    }
 }

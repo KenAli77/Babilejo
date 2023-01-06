@@ -13,7 +13,7 @@ data class Post(
     val timeStamp:Long? = null,
     val userName: String? = null,
     val userPhotoUrl: String? = null,
-    val likes:Int? = null,
+    val likes:List<User>? = null,
     val shares:Int? = null,
     val place: String? = null,
 )

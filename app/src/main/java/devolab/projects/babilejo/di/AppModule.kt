@@ -2,6 +2,7 @@ package devolab.projects.babilejo.di
 
 import android.app.Application
 import android.content.Context
+import android.location.Geocoder
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.Identity
 import com.google.android.gms.auth.api.identity.SignInClient
@@ -23,6 +24,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.android.scopes.ViewModelScoped
 import dagger.hilt.components.SingletonComponent
 import devolab.projects.babilejo.BuildConfig
 import devolab.projects.babilejo.R
@@ -31,10 +33,9 @@ import devolab.projects.babilejo.data.repository.UserAuthRepositoryImpl
 import devolab.projects.babilejo.data.repository.MainRepositoryImpl
 import devolab.projects.babilejo.domain.repository.UserAuthRepository
 import devolab.projects.babilejo.domain.repository.MainRepository
-import devolab.projects.babilejo.ui.authentication.UserAuthViewModel
-import devolab.projects.babilejo.ui.main.MainViewModel
 import devolab.projects.babilejo.util.SIGN_IN_REQUEST
 import devolab.projects.babilejo.util.SIGN_UP_REQUEST
+import java.util.*
 import javax.inject.Named
 import javax.inject.Singleton
 
@@ -44,15 +45,19 @@ object AppModule {
 
 
     @Provides
+    @Singleton
     fun provideFirebaseAuth() = Firebase.auth
 
     @Provides
+    @Singleton
     fun provideFirebaseFirestore() = Firebase.firestore
 
     @Provides
+    @Singleton
     fun provideFirebaseStorage() = Firebase.storage
 
     @Provides
+    @Singleton
     fun provideOneTapClient(
         @ApplicationContext
         context: Context
@@ -60,6 +65,7 @@ object AppModule {
 
     @Provides
     @Named(SIGN_IN_REQUEST)
+    @Singleton
     fun provideSignInRequest(app: Application) =
         BeginSignInRequest.builder().setGoogleIdTokenRequestOptions(
             BeginSignInRequest.GoogleIdTokenRequestOptions.builder()
@@ -74,6 +80,7 @@ object AppModule {
 
     @Provides
     @Named(SIGN_UP_REQUEST)
+    @Singleton
     fun provideSignUpRequest(app: Application) =
         BeginSignInRequest.builder().setGoogleIdTokenRequestOptions(
             BeginSignInRequest.GoogleIdTokenRequestOptions.builder()
@@ -86,6 +93,7 @@ object AppModule {
 
 
     @Provides
+    @Singleton
     fun provideGoogleSignInOptions(
         app: Application
     ) = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -102,7 +110,7 @@ object AppModule {
 
 
     @Provides
-    @Singleton
+    @ViewModelScoped
     fun provideUserAuthRepository(
         auth: FirebaseAuth,
         oneTapClient: SignInClient,
@@ -120,8 +128,8 @@ object AppModule {
     )
 
     @Provides
-    @Singleton
-    fun provideUserProfileRepository(
+    @ViewModelScoped
+    fun provideMainRepository(
         auth: FirebaseAuth,
         oneTapClient: SignInClient,
         signInClient: GoogleSignInClient,
@@ -151,19 +159,26 @@ object AppModule {
 
     }
 
-
     @Provides
     @Singleton
     fun providesLocationTracker(
         app: Application,
         locationProviderClient: FusedLocationProviderClient,
-        placesClient: PlacesClient
+        placesClient: PlacesClient,
+        geocoder: Geocoder
     ): DefaultLocationTracker =
         DefaultLocationTracker(
             application = app,
             fusedLocationProviderClient = locationProviderClient,
-            placesClient = placesClient
+            placesClient = placesClient,
+            geocoder = geocoder
         )
+
+    @Provides
+    @Singleton
+    fun providesGeoCoder(
+        app: Application
+    ): Geocoder = Geocoder(app, Locale.getDefault())
 
 
 }

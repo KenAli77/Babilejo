@@ -24,11 +24,19 @@ interface MainRepository {
 
     suspend fun addPost(post: Post, imageBitmap: Bitmap?=null):Resource<Void>
 
+    suspend fun postComment(comment: Comment,postId:String):Resource<Void>
+
     suspend fun getPosts(): MutableLiveData<Resource<QuerySnapshot>>
 
     suspend fun updateUserLocation(location: Location):Resource<Void>
 
     fun getUserUpdates(): Flow<Resource<List<User>>>
 
+    suspend fun getPostUpdates(postId:String):Flow<Resource<Post>>
+
     suspend fun getUserOnlineStatus(uid:String?):Resource<OnlineStatus>
+
+    suspend fun likePost(postId: String):Resource<Void>
+
+
 }

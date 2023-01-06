@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import com.google.android.gms.auth.api.identity.SignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.ktx.firestore
@@ -35,19 +36,21 @@ class MainRepositoryImpl @Inject constructor(
     private val firestore: FirebaseFirestore,
     private val storage: FirebaseStorage
 ) : MainRepository {
+    private val tag = "MainRepositoryImpl"
     override val displayName: String
         get() = auth.currentUser?.displayName.toString()
     override val photoUrl: String
         get() = auth.currentUser?.photoUrl.toString()
 
     private val userCollection = Firebase.firestore.collection("users")
+    private val postsCollection = Firebase.firestore.collection("posts_global")
 
     override val currentUser = auth.currentUser
 
     override suspend fun getUserData(uid: String?): UserDataResponse {
 
 
-        val userId = uid?:currentUser?.uid
+        val userId = uid ?: currentUser?.uid
         return try {
             val user = db.collection(USERS).document(userId!!).get().await()
 
@@ -161,6 +164,30 @@ class MainRepositoryImpl @Inject constructor(
 
         }
 
+    override suspend fun postComment(comment: Comment, postId: String): Resource<Void> {
+        return suspendCancellableCoroutine { cont ->
+
+            firestore.collection("posts_global").document(postId)
+                .update("comments", FieldValue.arrayUnion(comment)).addOnCompleteListener {
+
+                    if (it.isSuccessful) {
+                        cont.resume(Resource.Success(it.result))
+                    }
+
+                    it.exception?.let { e ->
+                        cont.resume(Resource.Error<Void>(e.message.toString()))
+                    }
+
+                    if (it.isCanceled) {
+                        cont.cancel()
+                    }
+
+                }
+
+        }
+
+    }
+
     override suspend fun getPosts(): MutableLiveData<Resource<QuerySnapshot>> {
         val result = MutableLiveData<Resource<QuerySnapshot>>()
 
@@ -222,6 +249,33 @@ class MainRepositoryImpl @Inject constructor(
 
         }
 
+    override suspend fun getPostUpdates(postId: String): Flow<Resource<Post>> = callbackFlow {
+        val listener = postsCollection.document(postId).addSnapshotListener { value, error ->
+
+            error?.let {
+                it.printStackTrace()
+                launch {
+                    send(Resource.Error(it.message.toString()))
+                    close(it)
+                }
+            }
+
+            value?.let {
+                val post = it.toObject<Post>()
+                launch {
+                    Log.e(tag, "${post?.comments?.size}")
+                    send(Resource.Success(post))
+                }
+            }
+
+        }
+
+        awaitClose {
+            listener.remove()
+            channel.close()
+        }
+    }
+
     override fun getUserUpdates(): Flow<Resource<List<User>>> = callbackFlow {
         val snapshotListener = userCollection.addSnapshotListener { value, error ->
 
@@ -235,7 +289,6 @@ class MainRepositoryImpl @Inject constructor(
                 val users = it.toObjects<User>()
 
                 launch { send(Resource.Success(users)) }
-
 
             }
 
@@ -272,6 +325,19 @@ class MainRepositoryImpl @Inject constructor(
 
 
         }
+
+    override suspend fun likePost(postId: String): Resource<Void> {
+        return suspendCancellableCoroutine {
+            currentUser?.let {
+
+                val user = currentUser.toUser()
+                firestore.collection("posts_global").document(postId)
+                    .update("likes", FieldValue.arrayUnion(user))
+
+            }
+
+        }
+    }
 
 
 }

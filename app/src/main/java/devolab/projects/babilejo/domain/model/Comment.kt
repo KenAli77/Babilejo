@@ -7,4 +7,6 @@ data class Comment(
     val text:String?=null,
     val likes:Int?=null,
     val timeStamp:Long?=null,
+    val userPhotoUrl:String? = null,
+    val userName:String? = null,
 )

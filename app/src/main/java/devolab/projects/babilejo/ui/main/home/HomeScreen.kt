@@ -97,6 +97,8 @@ fun HomeScreen(
     LogoutDialog(openDialog = openDialog, logout = {
         authViewModel.logOut()
         navController.navigateUp()
+        context.stopService(Intent(context, LocationUpdateService::class.java))
+
     })
     Box(
         modifier = Modifier
@@ -114,6 +116,11 @@ fun HomeScreen(
 
         }
 
+        /**
+        TODO:
+        Add banner under topbar to filter posts for type ( people, events, all, shopping etc..)
+         **/
+
         state.data?.let {
             LazyColumn(state = lazyListState, modifier = Modifier.padding(top = 65.dp)) {
 
@@ -124,8 +131,15 @@ fun HomeScreen(
                         locality = item.place ?: "",
                         onShare = {},
                         onLookUp = {},
-                        onLike = {},
-                        onComment = {navController.navigate(Screens.Comment.route)})
+                        onLike = {
+                            item.id?.let {
+                                mainViewModel.likePost(item.id)
+                            }
+                        },
+                        onComment = {
+                            mainViewModel.selectPost(item)
+                            navController.navigate(Screens.Comment.route)
+                        })
                 }
             }
         }
@@ -133,7 +147,9 @@ fun HomeScreen(
         HomeTopBar(
 
             lazyListState = lazyListState,
-            onPostClick = { navController.navigate(Screens.NewPost.route) }
+            onPostClick = {
+                navController.navigate(Screens.NewPost.route)
+            }
         )
 
     }

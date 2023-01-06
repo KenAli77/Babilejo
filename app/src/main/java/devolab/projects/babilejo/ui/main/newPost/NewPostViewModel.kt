@@ -39,7 +39,7 @@ class NewPostViewModel @Inject constructor(
         imageBitmap: Bitmap? = null,
         user: User,
         currentLocation: android.location.Location,
-        place: String
+        place: String?
     ) =
         viewModelScope.launch {
 

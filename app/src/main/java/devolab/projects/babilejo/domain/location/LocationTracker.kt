@@ -15,4 +15,6 @@ interface LocationTracker {
 
     suspend fun getCurrentPlace():Resource<FindCurrentPlaceResponse>
 
+    suspend fun getCurrentAddress():String
+
 }

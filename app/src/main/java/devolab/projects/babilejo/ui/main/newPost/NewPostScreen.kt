@@ -16,7 +16,9 @@ import androidx.compose.material.icons.rounded.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
@@ -57,6 +59,8 @@ fun NewPostScreen(navHostController: NavHostController, mainViewModel: MainViewM
         var caption by remember {
             mutableStateOf("")
         }
+
+        val place by remember { mutableStateOf(mainViewModel.place) }
 
         var hintVisible by remember { mutableStateOf(true) }
 
@@ -160,7 +164,7 @@ fun NewPostScreen(navHostController: NavHostController, mainViewModel: MainViewM
                         }
                         perm.isPermanentlyDenied() -> {
                             dialogText =
-                                "Media permissions were peremanently" + "denied. You can enable it in the app" + "settings."
+                                "Media permissions were permanently" + "denied. You can enable it in the app" + "settings."
 
                         }
                     }
@@ -204,6 +208,10 @@ fun NewPostScreen(navHostController: NavHostController, mainViewModel: MainViewM
 
         val scrollState = rememberScrollState()
 
+
+        val focusRequester = remember { FocusRequester() }
+        val focusManager = LocalFocusManager.current
+
         ConstraintLayout(modifier = Modifier.fillMaxSize()) {
             val (topBar, imageView, actionBar, header, textField, postContainer) = createRefs()
 
@@ -218,49 +226,58 @@ fun NewPostScreen(navHostController: NavHostController, mainViewModel: MainViewM
             userdata?.let {
                 NewPostHeader(userName = userName,
                     photoUrl = userPhotoUrl,
-                    location = mainViewModel.place,
+                    location = place,
                     modifier = Modifier
                         .constrainAs(header) {
                             top.linkTo(topBar.bottom)
                             start.linkTo(parent.start)
+                            bottom.linkTo(postContainer.top)
                         }
-                        .padding(10.dp))
+                        .padding(top = 10.dp, end = 10.dp, start = 10.dp))
             }
 
-            Column(modifier = Modifier
-                .constrainAs(postContainer) {
-                    top.linkTo(header.bottom)
-                    //  bottom.linkTo(actionBar.top)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                }
-                .padding(bottom = 200.dp)
-                .verticalScroll(scrollState, enabled = true)) {
-                ConstraintLayout() {
 
-                    TextFieldLarge(
-                        text = caption,
-                        onValueChange = { caption = it },
-                        keyboardController = keyboardController,
-                        modifier = Modifier.constrainAs(textField) {
+            ConstraintLayout(
+                modifier = Modifier
+                    .constrainAs(postContainer) {
+                        top.linkTo(header.bottom)
+                        //  bottom.linkTo(actionBar.top)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                        //   height = Dimension.fillToConstraints
+                    }
+                    .padding(bottom = 200.dp)
+                    .verticalScroll(scrollState, enabled = true)
+            ) {
+
+                BasicTextFieldCustom(
+                    text = caption,
+                    onValueChange = { caption = it },
+                    keyboardController = keyboardController,
+                    modifier = Modifier
+                        .constrainAs(textField) {
                             top.linkTo(header.bottom)
                             start.linkTo(parent.start)
                             end.linkTo(parent.end)
-                        }.fillMaxWidth()
+                        }
+                        .fillMaxWidth()
+                        .padding(horizontal = 5.dp),
+                    focusManager = focusManager,
+                    focusRequester = focusRequester
 
-                    )
+                )
 
-                    bitmap?.let {
-                        ImageContainer(image = it, modifier = Modifier
-                            .constrainAs(imageView) {
-                                top.linkTo(textField.bottom, margin = 10.dp)
-                            }
-                            .padding(horizontal = 10.dp), onRemove = {
-                            bitmap = null
-                            imageUri = null
-                        }, onEdit = { pickPhoto() })
-                    }
+                bitmap?.let {
+                    ImageContainer(image = it, modifier = Modifier
+                        .constrainAs(imageView) {
+                            top.linkTo(textField.bottom, margin = 10.dp)
+                        }
+                        .padding(horizontal = 10.dp), onRemove = {
+                        bitmap = null
+                        imageUri = null
+                    }, onEdit = { pickPhoto() })
                 }
+
             }
 
             NewPostActionBar(onAddPhoto = { pickPhoto() },
@@ -281,6 +298,7 @@ fun NewPostScreen(navHostController: NavHostController, mainViewModel: MainViewM
                                 place = mainViewModel.place
                             )
                             Toast.makeText(context, "loading post..", Toast.LENGTH_SHORT).show()
+                            focusManager.clearFocus()
                         }
 
 
@@ -303,7 +321,7 @@ fun NewPostScreen(navHostController: NavHostController, mainViewModel: MainViewM
 
         BackHandler(true) {
             navHostController.navigateUp()
-            navHostController.popBackStack(Screens.NewPost.route,true)
+            navHostController.popBackStack(Screens.NewPost.route, true)
         }
 
         LaunchedEffect(key1 = hasImage, key2 = imageUri) {

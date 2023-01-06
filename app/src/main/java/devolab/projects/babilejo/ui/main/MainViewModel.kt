@@ -1,14 +1,18 @@
 package devolab.projects.babilejo.ui.main
 
 import android.app.Application
+import android.location.Geocoder
 import android.location.Location
 import android.util.Log
 import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.libraries.places.api.net.PlacesClient
 import dagger.hilt.android.lifecycle.HiltViewModel
 import devolab.projects.babilejo.data.location.DefaultLocationTracker
 import devolab.projects.babilejo.data.repository.MainRepositoryImpl
+import devolab.projects.babilejo.domain.model.Post
 import devolab.projects.babilejo.domain.model.Resource
 import devolab.projects.babilejo.domain.model.User
 import kotlinx.coroutines.cancel
@@ -21,7 +25,7 @@ import javax.inject.Inject
 class MainViewModel @Inject constructor(
     private val repo: MainRepositoryImpl,
     private val locationTracker: DefaultLocationTracker,
-    private val app: Application,
+
 ) : ViewModel() {
 
     private val TAG = "MainViewModel"
@@ -35,6 +39,8 @@ class MainViewModel @Inject constructor(
     var locationState by mutableStateOf(LocationState())
         private set
 
+    var selectedPost by mutableStateOf(Post())
+        private set
 
     var liveLocation = MutableStateFlow<Location?>(null)
         private set
@@ -44,8 +50,7 @@ class MainViewModel @Inject constructor(
 
     var userData by mutableStateOf<User?>(null)
 
-
-    var place by mutableStateOf("")
+    var place by mutableStateOf<String?>(null)
 
     init {
         getLastKnownPosition()
@@ -139,6 +144,7 @@ class MainViewModel @Inject constructor(
 
 
     fun getPLace() = viewModelScope.launch {
+        /*
         val result = locationTracker.getCurrentPlace()
 
         when (result) {
@@ -166,12 +172,22 @@ class MainViewModel @Inject constructor(
 
             }
         }
+
+         */
+        val result = locationTracker.getCurrentAddress()
+
+        place = result
     }
 
-    fun logout() {
-        viewModelScope.launch {
-
-        }
+    fun selectPost(post: Post) {
+        selectedPost = post
     }
+
+    fun likePost(id: String) = viewModelScope.launch {
+
+
+        repo.likePost(id)
+    }
+
 
 }
