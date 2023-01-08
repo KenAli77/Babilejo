@@ -29,6 +29,7 @@ fun ProfileScreen(navController: NavHostController, mainViewModel: MainViewModel
         ) {
 
             user?.userName?.let { Text(text = it, fontSize = 50.sp) }
+
         }
     }
 }

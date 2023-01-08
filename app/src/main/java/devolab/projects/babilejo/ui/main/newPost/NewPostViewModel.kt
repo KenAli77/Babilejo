@@ -3,7 +3,6 @@ package devolab.projects.babilejo.ui.main.newPost
 import android.graphics.Bitmap
 import android.net.Uri
 import android.util.Log
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -11,11 +10,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import devolab.projects.babilejo.data.repository.MainRepositoryImpl
-import devolab.projects.babilejo.domain.model.Location
 import devolab.projects.babilejo.domain.model.Post
 import devolab.projects.babilejo.domain.model.Resource
 import devolab.projects.babilejo.domain.model.User
-import devolab.projects.babilejo.ui.main.MainViewModel
 import devolab.projects.babilejo.ui.main.newPost.state.NewPostState
 import devolab.projects.babilejo.util.toLocation
 import kotlinx.coroutines.launch

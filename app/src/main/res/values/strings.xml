@@ -29,4 +29,12 @@
     <string name="new_post">new post</string>
     <string name="photo_permissions_required">Media permissions are required to take a photo</string>
     <string name="comment_screen">comment</string>
+    <string name="people_filter_title">People</string>
+    <string name="events_filter_title">Events</string>
+    <string name="stores_filter_title">Stores</string>
+    <string name="all_filter_title">All</string>
+    <string name="culture_filter_title">Culture</string>
+    <string name="party_filter_title">Party</string>
+    <string name="outdoors_filter_title">Outdoors</string>
+    <string name="sports_filter_title">Sport</string>
 </resources>

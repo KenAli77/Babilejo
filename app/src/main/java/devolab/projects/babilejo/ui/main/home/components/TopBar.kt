@@ -7,8 +7,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.AddBox
-import androidx.compose.material.icons.outlined.Chat
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -19,18 +18,20 @@ import androidx.compose.ui.unit.sp
 import devolab.projects.babilejo.ui.authentication.components.Logo
 import devolab.projects.babilejo.ui.theme.Yellow
 import devolab.projects.babilejo.util.TOP_BAR_HEIGHT
+import devolab.projects.babilejo.util.TOP_BAR_ICON_SIZE
 import devolab.projects.babilejo.util.isScrolled
 
 @Composable
 fun HomeTopBar(
+    modifier: Modifier = Modifier,
     lazyListState: LazyListState,
     onChatClick: () -> Unit = {},
-    onPostClick: () -> Unit = {}
+    onPostClick: () -> Unit = {},
+    openFilters:()->Unit = {}
 ) {
-    // val barHeight by animateDpAsState(targetValue = if (lazyListState.isScrolled) 0.dp else TOP_BAR_HEIGHT)
 
     TopAppBar(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             // .animateContentSize(animationSpec = tween(300))
             .height(height = TOP_BAR_HEIGHT),
@@ -57,7 +58,7 @@ fun HomeTopBar(
                         imageVector = Icons.Outlined.AddBox,
                         contentDescription = null,
                         modifier = Modifier
-                            .size(30.dp),
+                            .size(TOP_BAR_ICON_SIZE),
                         tint = Color.White
                     )
                 }
@@ -67,7 +68,17 @@ fun HomeTopBar(
                         imageVector = Icons.Outlined.Chat,
                         contentDescription = null,
                         modifier = Modifier
-                            .size(30.dp),
+                            .size(TOP_BAR_ICON_SIZE),
+                        tint = Color.White
+                    )
+                }
+
+                IconButton(onClick = { openFilters() }) {
+                    Icon(
+                        imageVector = Icons.Outlined.Tune,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(TOP_BAR_ICON_SIZE),
                         tint = Color.White
                     )
                 }

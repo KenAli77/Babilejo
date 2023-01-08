@@ -208,7 +208,7 @@ class MainRepositoryImpl @Inject constructor(
         return result
     }
 
-    override suspend fun updateUserLocation(location: Location): Resource<Void> =
+    override suspend fun updateUserLocation(location: LocationCustom): Resource<Void> =
         suspendCancellableCoroutine { cont ->
 
             try {
@@ -326,15 +326,23 @@ class MainRepositoryImpl @Inject constructor(
 
         }
 
-    override suspend fun likePost(postId: String): Resource<Void> {
-        return suspendCancellableCoroutine {
-            currentUser?.let {
+    override suspend fun likePost(postId: String,user:User?): Resource<Void> {
+        return suspendCancellableCoroutine { cont ->
+            user?.let {
 
-                val user = currentUser.toUser()
+
                 firestore.collection("posts_global").document(postId)
-                    .update("likes", FieldValue.arrayUnion(user))
+                    .update("likes", FieldValue.arrayUnion(user)).addOnCompleteListener {
+                        if(it.isSuccessful) {
+                            cont.resume(Resource.Success(it.result))
+                        }
+                        it.exception?.let {
+                            it.printStackTrace()
+                            cont.resume(Resource.Error(it.message.toString()))
+                        }
+                    }
 
-            }
+            } ?: cont.resume(Resource.Error("$tag Failed to like post: User data is not available"))
 
         }
     }

@@ -1,17 +1,15 @@
 package devolab.projects.babilejo.ui.main
 
-import android.app.Application
-import android.location.Geocoder
 import android.location.Location
 import android.util.Log
 import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.libraries.places.api.net.PlacesClient
 import dagger.hilt.android.lifecycle.HiltViewModel
 import devolab.projects.babilejo.data.location.DefaultLocationTracker
 import devolab.projects.babilejo.data.repository.MainRepositoryImpl
+import devolab.projects.babilejo.domain.filters.PostCategory
+import devolab.projects.babilejo.domain.model.LocationCustom
 import devolab.projects.babilejo.domain.model.Post
 import devolab.projects.babilejo.domain.model.Resource
 import devolab.projects.babilejo.domain.model.User
@@ -51,6 +49,17 @@ class MainViewModel @Inject constructor(
     var userData by mutableStateOf<User?>(null)
 
     var place by mutableStateOf<String?>(null)
+
+    var filters = mutableSetOf<PostCategory>()
+        private set
+
+    var selectedLocation by mutableStateOf(LocationCustom())
+    private set
+
+
+    fun applyFilters(items: Set<PostCategory>) {
+        filters = items as MutableSet<PostCategory>
+    }
 
     init {
         getLastKnownPosition()
@@ -185,8 +194,13 @@ class MainViewModel @Inject constructor(
 
     fun likePost(id: String) = viewModelScope.launch {
 
+        repo.likePost(id,userData)
+    }
 
-        repo.likePost(id)
+    fun selectLocation(location: LocationCustom?) {
+
+        selectedLocation = location!!
+
     }
 
 

@@ -1,16 +1,13 @@
 package devolab.projects.babilejo.ui.main.explore
 
-import android.os.Build
-import android.widget.Toast
-import androidx.annotation.RequiresApi
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.navigation.NavHostController
-import devolab.projects.babilejo.ui.authentication.components.AuthProgressBar
+import devolab.projects.babilejo.domain.model.LocationCustom
 import devolab.projects.babilejo.ui.main.MainViewModel
 import devolab.projects.babilejo.ui.main.explore.components.ExploreMapView
 
@@ -20,6 +17,9 @@ fun ExploreScreen(navController: NavHostController, mainViewModel: MainViewModel
 
     val currentPosition by mainViewModel.liveLocation.collectAsState()
 
+    val selectedLocation = mainViewModel.selectedLocation
+
+    val lifecycleOwner = LocalLifecycleOwner.current
 
     with(viewModel) {
 
@@ -30,15 +30,34 @@ fun ExploreScreen(navController: NavHostController, mainViewModel: MainViewModel
         LaunchedEffect(key1 = currentPosition) {
 
 
-
         }
 
 //        if (currentPosition.loading) {
 //            AuthProgressBar()
 //        }
 
-        ExploreMapView(location = currentPosition, users = usersData)
+        ExploreMapView(
+            location = currentPosition,
+            users = usersData,
+            selectedLocation = selectedLocation
+        )
 
+
+    }
+
+
+    DisposableEffect(key1 = lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_STOP) {
+                mainViewModel.selectLocation(LocationCustom())
+            }
+        }
+
+        lifecycleOwner.lifecycle.addObserver(observer)
+
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
 
     }
 

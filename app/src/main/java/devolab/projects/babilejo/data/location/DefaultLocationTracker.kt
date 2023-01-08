@@ -101,7 +101,7 @@ class DefaultLocationTracker @Inject constructor(
                 }
                 addOnCanceledListener {
                     cont.cancel()
-                    Log.e("cancelled", "Location fetch cancelled")
+                    Log.e("cancelled", "LocationCustom fetch cancelled")
                 }
             }
 

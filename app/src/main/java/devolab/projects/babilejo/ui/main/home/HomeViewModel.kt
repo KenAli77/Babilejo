@@ -13,10 +13,8 @@ import devolab.projects.babilejo.data.repository.MainRepositoryImpl
 import devolab.projects.babilejo.domain.model.Post
 import devolab.projects.babilejo.domain.model.Resource
 import devolab.projects.babilejo.domain.model.User
-import devolab.projects.babilejo.ui.main.MainViewModel
 import devolab.projects.babilejo.ui.main.home.state.HomeState
 import devolab.projects.babilejo.util.toLocation
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.ArrayList
 import javax.inject.Inject
@@ -29,13 +27,15 @@ class HomeViewModel @Inject constructor(
     private val TAG = "HomeViewModel"
 
     var state by mutableStateOf(HomeState(loading = true))
+        private set
 
 
     var range by mutableStateOf(800f)
+        private set
 
 
 
-    fun getPosts(currentLocation: Location,currentUser: User) = viewModelScope.launch {
+    fun getPosts(currentLocation: Location, currentUser: User) = viewModelScope.launch {
         val result = repo.getPosts()
 
         result.observeForever {

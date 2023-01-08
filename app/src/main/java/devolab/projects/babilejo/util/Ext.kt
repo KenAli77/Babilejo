@@ -11,7 +11,6 @@ import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
 import android.provider.Settings
-import android.util.Log
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
@@ -33,7 +32,6 @@ fun FirebaseUser.toUser() = User(
     photoUrl = photoUrl?.toString(),
 )
 
-val TOP_BAR_HEIGHT = 65.dp
 
 val LazyListState.isScrolled: Boolean
     get() = firstVisibleItemIndex > 0 || firstVisibleItemScrollOffset > 0
@@ -59,8 +57,8 @@ fun getTimeAgo(timestamp: Long): String {
 
 // this function is necessary to store the location data to firebase and retrieve it
 // it transforms the location object to a custom location object with no parameters constructors
-fun Location.toLocation(): devolab.projects.babilejo.domain.model.Location {
-    return devolab.projects.babilejo.domain.model.Location(
+fun Location.toLocation(): devolab.projects.babilejo.domain.model.LocationCustom {
+    return devolab.projects.babilejo.domain.model.LocationCustom(
         latitude = latitude,
         longitude = longitude,
         altitude = altitude,
@@ -72,7 +70,7 @@ fun Location.toLocation(): devolab.projects.babilejo.domain.model.Location {
     )
 }
 
-fun devolab.projects.babilejo.domain.model.Location.toLocation(): Location {
+fun devolab.projects.babilejo.domain.model.LocationCustom.toLocation(): Location {
     val location = Location("custom location")
     location.latitude = latitude!!
     location.longitude = longitude!!

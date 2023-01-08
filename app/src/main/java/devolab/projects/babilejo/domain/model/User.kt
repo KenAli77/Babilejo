@@ -7,7 +7,7 @@ data class User(
     val displayName:String?=null,
     val userEmail:String?=null,
     val photoUrl:String?=null,
-    val location: Location?=null,
+    val location: LocationCustom?=null,
     val online:Boolean? = null,
     val lastOnline: Long? = null,
 )

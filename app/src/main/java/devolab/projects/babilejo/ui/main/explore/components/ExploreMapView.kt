@@ -1,9 +1,6 @@
 package devolab.projects.babilejo.ui.main.explore.components
 
 import android.location.Location
-import android.os.Build
-import android.util.Log
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Icon
@@ -15,19 +12,16 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.*
 import devolab.projects.babilejo.R
+import devolab.projects.babilejo.domain.model.LocationCustom
 import devolab.projects.babilejo.domain.model.User
-import devolab.projects.babilejo.ui.main.explore.ExploreViewModel
 import devolab.projects.babilejo.ui.theme.PearlWhite
 import devolab.projects.babilejo.ui.theme.Yellow
 import devolab.projects.babilejo.util.bitmapFromVector
@@ -36,11 +30,16 @@ import kotlinx.coroutines.launch
 const val TAG = "ExploreMapView"
 
 @Composable
-fun ExploreMapView(location: Location?, users: SnapshotStateList<User>) {
+fun ExploreMapView(
+    location: Location?,
+    users: SnapshotStateList<User>,
+    selectedLocation: LocationCustom
+) {
 
     val context = LocalContext.current
 
     with(context) {
+
 
         location?.let { location ->
 
@@ -63,7 +62,17 @@ fun ExploreMapView(location: Location?, users: SnapshotStateList<User>) {
                 )
             }
             val properties by remember { mutableStateOf(MapProperties(isMyLocationEnabled = true)) }
+            selectedLocation.longitude?.let {
 
+                val selectedLatLng = LatLng(selectedLocation.latitude!!, selectedLocation.longitude)
+
+                scope.launch {
+                    cameraPositionState.animate(
+                        update = CameraUpdateFactory.newLatLng(selectedLatLng)
+                    )
+                }
+
+            }
             Surface(modifier = Modifier.fillMaxSize()) {
 
                 Box(
@@ -99,6 +108,18 @@ fun ExploreMapView(location: Location?, users: SnapshotStateList<User>) {
                                 }
                             }
 
+
+                        }
+
+                        if (selectedLocation.latitude != null && selectedLocation.longitude != null) {
+                            Marker(
+                                state = rememberMarkerState(
+                                    position = LatLng(
+                                        selectedLocation.latitude,
+                                        selectedLocation.longitude
+                                    )
+                                )
+                            )
 
                         }
 
@@ -138,7 +159,7 @@ fun MyLocationButton(
             scope.launch {
                 onClick()
             }
-        }, modifier = modifier.align(Alignment.BottomEnd)) {
+        }, modifier = modifier.align(Alignment.BottomCenter)) {
 
             Surface(
                 modifier = Modifier

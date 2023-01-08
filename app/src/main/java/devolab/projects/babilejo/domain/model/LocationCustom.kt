@@ -1,6 +1,6 @@
 package devolab.projects.babilejo.domain.model
 
-data class Location(
+data class LocationCustom(
     val latitude: Double?= null,
     val longitude: Double? = null,
     val altitude: Double? = null,

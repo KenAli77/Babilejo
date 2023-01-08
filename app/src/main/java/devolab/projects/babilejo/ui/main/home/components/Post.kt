@@ -10,9 +10,7 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Favorite
-import androidx.compose.material.icons.outlined.Forum
-import androidx.compose.material.icons.outlined.Share
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.material.icons.rounded.LocationOn
 import androidx.compose.material.icons.rounded.MoreHoriz
 import androidx.compose.material.ripple.rememberRipple
@@ -43,6 +41,7 @@ fun Post(
     onComment: () -> Unit = {},
     onShare: () -> Unit = {},
     onLookUp: () -> Unit = {},
+    liked: Boolean
 ) {
     var userPhotoUrl by remember { mutableStateOf("") }
     var userName by remember { mutableStateOf("") }
@@ -50,12 +49,6 @@ fun Post(
         mutableStateOf("")
     }
     var caption by remember { mutableStateOf("") }
-
-    var liked by remember { mutableStateOf(false) }
-
-    post.likes?.let {  likes ->
-        liked = likes.any { it.userName == userName }
-    }
 
     LaunchedEffect(key1 = post.userName) {
         post.userName?.let {
@@ -117,7 +110,6 @@ fun Post(
 
                 Log.e("PostPhoto", it)
 
-
                 CoilImage(
                     imageModel = { it },
                     modifier = Modifier
@@ -154,7 +146,7 @@ fun Post(
                 comments = post.comments?.size ?: 0,
                 shares = post.shares ?: 0,
                 onComment = { onComment() },
-                onLike = { if(!liked) onLike() },
+                onLike = { if (!liked) onLike() },
                 onLookUp = { onLookUp() },
                 onShare = { onShare() },
                 liked = liked
@@ -222,12 +214,6 @@ fun PostActionsBar(
     liked: Boolean,
 ) {
 
-    var likeColor by remember { mutableStateOf(Color.Black) }
-
-    if (liked) {
-        likeColor = Color.Red
-
-    }
 
     Row(
         modifier = modifier.fillMaxWidth(),
@@ -244,11 +230,10 @@ fun PostActionsBar(
                 enabled = true,
                 onClick = {
                     onLike()
-                    likeColor = Color.Red
                 },
                 indication = rememberRipple(bounded = false, radius = 16.dp),
             ),
-            tint = likeColor
+            tint = if (liked) Color.Red else Color.Black
         )
         if (likes > 0) {
             Text(
@@ -260,7 +245,7 @@ fun PostActionsBar(
         }
         Spacer(modifier = Modifier.width(40.dp))
         Icon(
-            imageVector = Icons.Outlined.Forum,
+            imageVector = Icons.Outlined.ModeComment,
             contentDescription = null,
             modifier = Modifier.clickable(
                 interactionSource = remember { MutableInteractionSource() },

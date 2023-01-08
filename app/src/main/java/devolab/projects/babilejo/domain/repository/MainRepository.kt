@@ -9,7 +9,6 @@ import devolab.projects.babilejo.util.RevokeAccessResponse
 import devolab.projects.babilejo.util.SignOutResponse
 import devolab.projects.babilejo.util.UserDataResponse
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 
 interface MainRepository {
     val displayName: String
@@ -28,7 +27,7 @@ interface MainRepository {
 
     suspend fun getPosts(): MutableLiveData<Resource<QuerySnapshot>>
 
-    suspend fun updateUserLocation(location: Location):Resource<Void>
+    suspend fun updateUserLocation(location: LocationCustom):Resource<Void>
 
     fun getUserUpdates(): Flow<Resource<List<User>>>
 
@@ -36,7 +35,7 @@ interface MainRepository {
 
     suspend fun getUserOnlineStatus(uid:String?):Resource<OnlineStatus>
 
-    suspend fun likePost(postId: String):Resource<Void>
+    suspend fun likePost(postId: String,user: User?):Resource<Void>
 
 
 }
