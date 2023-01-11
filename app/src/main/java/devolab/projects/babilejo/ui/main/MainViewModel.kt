@@ -9,10 +9,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import devolab.projects.babilejo.data.location.DefaultLocationTracker
 import devolab.projects.babilejo.data.repository.MainRepositoryImpl
 import devolab.projects.babilejo.domain.filters.PostCategory
-import devolab.projects.babilejo.domain.model.LocationCustom
-import devolab.projects.babilejo.domain.model.Post
-import devolab.projects.babilejo.domain.model.Resource
-import devolab.projects.babilejo.domain.model.User
+import devolab.projects.babilejo.domain.model.*
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.onCompletion
@@ -51,6 +48,9 @@ class MainViewModel @Inject constructor(
     var place by mutableStateOf<String?>(null)
 
     var filters = mutableSetOf<PostCategory>()
+        private set
+
+    var userStatus by mutableStateOf(OnlineStatus())
         private set
 
     var selectedLocation by mutableStateOf(LocationCustom())
