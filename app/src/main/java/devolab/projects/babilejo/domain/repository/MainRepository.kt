@@ -37,5 +37,7 @@ interface MainRepository {
 
     suspend fun likePost(postId: String,user: User?):Resource<Void>
 
+    suspend fun getUserPosts(uid:String?=null):Resource<List<Post>>
+
 
 }

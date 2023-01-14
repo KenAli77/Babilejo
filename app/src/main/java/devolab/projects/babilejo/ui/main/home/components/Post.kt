@@ -27,8 +27,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.compose.rememberNavController
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.coil.CoilImage
+import com.skydoves.landscapist.glide.GlideImage
 import devolab.projects.babilejo.R
 import devolab.projects.babilejo.domain.model.Post
 import devolab.projects.babilejo.ui.theme.Yellow
@@ -38,11 +40,13 @@ import devolab.projects.babilejo.util.getTimeAgo
 @Composable
 fun Post(
     post: Post, locality: String, onLike: () -> Unit = {},
-    onComment: () -> Unit = {},
+    onComment: () -> Unit = { },
     onShare: () -> Unit = {},
     onLookUp: () -> Unit = {},
+    onProfileClick: () -> Unit,
     liked: Boolean
 ) {
+
     var userPhotoUrl by remember { mutableStateOf("") }
     var userName by remember { mutableStateOf("") }
     var timeAgo by remember {
@@ -95,7 +99,8 @@ fun Post(
                     location = locality,
                     userName = userName,
                     time = timeAgo,
-                    photoUrl = userPhotoUrl
+                    photoUrl = userPhotoUrl,
+                    onProfileClick = { onProfileClick() }
                 )
                 Icon(
                     imageVector = Icons.Rounded.MoreHoriz,
@@ -168,7 +173,11 @@ fun PostPreview() {
 
 @Composable
 fun PostHeader(
-    location: String = "no location info", userName: String, time: String, photoUrl: String
+    location: String = "no location info",
+    userName: String,
+    time: String,
+    photoUrl: String,
+    onProfileClick: () -> Unit = {}
 ) {
 
     Row(
@@ -176,18 +185,7 @@ fun PostHeader(
         horizontalArrangement = Arrangement.spacedBy(5.dp)
     ) {
 
-        CoilImage(
-            imageModel = { photoUrl },
-            modifier = Modifier
-                .clip(
-                    CircleShape
-                )
-                .size(60.dp),
-            imageOptions = ImageOptions(
-                alignment = Alignment.Center,
-                contentScale = ContentScale.Crop,
-            )
-        )
+        ProfileImageCircle(imageUrl = photoUrl, onClick = { onProfileClick() }, modifier = Modifier.size(60.dp))
         Column(
             verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.Start
         ) {
@@ -312,5 +310,22 @@ fun Caption(modifier: Modifier, text: String = stringResource(id = R.string.lore
         )
 
     }
+
+}
+
+@Composable
+fun ProfileImageCircle(modifier: Modifier = Modifier, imageUrl: String?, onClick: () -> Unit={}) {
+
+
+    GlideImage(imageModel = { imageUrl }, modifier = modifier
+        .clip(CircleShape)
+        .clickable {
+            onClick()
+        }, imageOptions = ImageOptions(
+        alignment = Alignment.Center,
+        contentScale = ContentScale.Crop,
+        contentDescription = null )
+    )
+
 
 }

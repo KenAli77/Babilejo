@@ -211,7 +211,10 @@ fun HomeScreen(
                             mainViewModel.selectPost(item)
                             navController.navigate(Screens.Comment.route)
                         },
-                        liked = liked
+                        liked = liked,
+                        onProfileClick = { 
+                            mainViewModel.getUserData(item.uid)
+                            navController.navigate(Screens.Profile.route) }
                     )
                 }
             }

@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.coil.CoilImage
+import devolab.projects.babilejo.ui.main.home.components.ProfileImageCircle
 import devolab.projects.babilejo.ui.theme.Yellow
 import devolab.projects.babilejo.util.TOP_BAR_HEIGHT
 
@@ -113,16 +114,8 @@ fun NewPostHeader(
             .height(65.dp),
         horizontalArrangement = Arrangement.spacedBy(5.dp)
     ) {
-        CoilImage(
-            imageModel = { photoUrl },
-            imageOptions = ImageOptions(
-                alignment = Alignment.Center,
-                contentScale = ContentScale.Crop
-            ),
-            modifier = Modifier
-                .clip(CircleShape)
-                .size(60.dp),
-        )
+
+        ProfileImageCircle( modifier = Modifier.size(60.dp),imageUrl = photoUrl )
         Column(
             modifier = Modifier.height(60.dp),
             verticalArrangement = Arrangement.Center,

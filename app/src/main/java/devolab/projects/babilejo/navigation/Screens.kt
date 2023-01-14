@@ -33,6 +33,8 @@ sealed class Screens(
     //
     object NewPost:Screens(route = "new_post_screen", title = R.string.new_post)
     object Comment:Screens(route = "comment_screen", title = R.string.comment_screen)
+    object UserProfile:Screens(route = "user_profile_screen", title = R.string.user_profile)
+
 
 
 

@@ -21,7 +21,7 @@ class MainViewModel @Inject constructor(
     private val repo: MainRepositoryImpl,
     private val locationTracker: DefaultLocationTracker,
 
-) : ViewModel() {
+    ) : ViewModel() {
 
     private val TAG = "MainViewModel"
 
@@ -54,8 +54,9 @@ class MainViewModel @Inject constructor(
         private set
 
     var selectedLocation by mutableStateOf(LocationCustom())
-    private set
+        private set
 
+    var selectedUser by mutableStateOf<User?>(null)
 
     fun applyFilters(items: Set<PostCategory>) {
         filters = items as MutableSet<PostCategory>
@@ -72,10 +73,11 @@ class MainViewModel @Inject constructor(
 
     }
 
-    fun getUserData() = viewModelScope.launch {
+    fun getUserData(uid: String?=null) = viewModelScope.launch {
         userData = null
 
-        val result = repo.getUserData()
+        val result = uid?.let{ repo.getUserData(it)}?:repo.getUserData()
+
 
         when (result) {
             is Resource.Error -> {
@@ -151,6 +153,31 @@ class MainViewModel @Inject constructor(
 
     }
 
+    fun getUserOnlineStatus(uid: String?=null) = viewModelScope.launch {
+        var result: Resource<OnlineStatus> = Resource.Loading()
+        uid?.let {
+            result = repo.getUserOnlineStatus(it)
+        } ?: userData?.uid?.let {
+            result = repo.getUserOnlineStatus(it)
+        }
+
+        when (result){
+            is Resource.Error -> {
+
+            }
+            is Resource.Loading -> {
+
+            }
+            is Resource.Success -> {
+                result.data?.let {
+                    userStatus = it
+                }
+            }
+
+        }
+
+    }
+
 
     fun getPLace() = viewModelScope.launch {
         /*
@@ -194,7 +221,7 @@ class MainViewModel @Inject constructor(
 
     fun likePost(id: String) = viewModelScope.launch {
 
-        repo.likePost(id,userData)
+        repo.likePost(id, userData)
     }
 
     fun selectLocation(location: LocationCustom?) {

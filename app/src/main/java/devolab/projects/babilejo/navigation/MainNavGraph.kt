@@ -15,6 +15,7 @@ import devolab.projects.babilejo.ui.main.home.HomeScreen
 import devolab.projects.babilejo.ui.main.newPost.NewPostScreen
 import devolab.projects.babilejo.ui.main.messages.MessagesScreen
 import devolab.projects.babilejo.ui.main.profile.ProfileScreen
+import devolab.projects.babilejo.ui.main.profile.UserProfileScreen
 import devolab.projects.babilejo.ui.main.settings.SettingsScreen
 
 fun NavGraphBuilder.mainNavGraph(
@@ -85,6 +86,15 @@ fun NavGraphBuilder.mainNavGraph(
             val mainViewModel = hiltViewModel<MainViewModel>(parentEntry)
 
             CommentScreen(mainViewModel,navController)
+        }
+
+        composable(Screens.UserProfile.route){ backStackEntry->
+            val parentEntry = remember(backStackEntry) {
+                navController.getBackStackEntry(MAIN_ROUTE)
+            }
+            val mainViewModel = hiltViewModel<MainViewModel>(parentEntry)
+
+            UserProfileScreen(mainViewModel = mainViewModel, navController = navController)
         }
 
 

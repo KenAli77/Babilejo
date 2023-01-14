@@ -37,4 +37,5 @@
     <string name="party_filter_title">Party</string>
     <string name="outdoors_filter_title">Outdoors</string>
     <string name="sports_filter_title">Sport</string>
+    <string name="user_profile">user profile</string>
 </resources>

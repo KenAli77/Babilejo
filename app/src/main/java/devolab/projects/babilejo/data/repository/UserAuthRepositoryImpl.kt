@@ -58,7 +58,7 @@ class UserAuthRepositoryImpl @Inject constructor(
         return try {
             val signInResult = oneTapClient.beginSignIn(signInRequest).await()
 
-            updateUserOnlineStatus(true)
+            updateUserOnlineStatus(true)?.await()
 
             Resource.Success(signInResult)
 
@@ -83,7 +83,7 @@ class UserAuthRepositoryImpl @Inject constructor(
             }
 
             authResult.user?.let {
-                updateUserOnlineStatus(true)
+                updateUserOnlineStatus(true)?.await()
             }
 
             Resource.Success(authResult)
@@ -133,7 +133,7 @@ class UserAuthRepositoryImpl @Inject constructor(
             val loginResult = auth.signInWithEmailAndPassword(email, password).await()
             Log.e("login", "logged in user ${loginResult.user?.uid}")
             loginResult.user?.let {
-                updateUserOnlineStatus(true)
+                updateUserOnlineStatus(true)?.await()
             }
             Resource.Success(loginResult)
 
@@ -145,66 +145,73 @@ class UserAuthRepositoryImpl @Inject constructor(
 
     override suspend fun logOut() {
 
-        updateUserOnlineStatus(false)
+        updateUserOnlineStatus(false)?.await()
+
         auth.signOut()
         oneTapClient.signOut()
 
     }
 
-    private suspend fun updateUserOnlineStatus(active: Boolean) {
+    private suspend fun updateUserOnlineStatus(active: Boolean) =
 
         withContext(Dispatchers.IO) {
 
             auth.currentUser?.let { user ->
 
                 val doc = db.collection("online_status").document(user.uid)
-                val docRef = doc.get().await()
+                doc.get().addOnCompleteListener { task ->
 
-                if (docRef.exists()) {
-                    if (active) {
+                    if (task.isSuccessful) {
+                        if (task.result.exists()) {
+                            if (active) {
 
-                        doc.update(
-                            mapOf(
-                                "online" to true,
-                                "lastOnline" to null
-                            )
-                        ).await()
+                                launch {
+                                    doc.update(mapOf("online" to true, "lastOnline" to null))
+                                        .await()
+                                }
 
-                    } else {
-                        Log.e(TAG, "online status $active")
-                        doc.update(
-                            mapOf(
-                                "online" to false,
-                                "lastOnline" to System.currentTimeMillis()
-                            )
-                        )
-                    }
-                } else {
-
-                    val status: OnlineStatus =
-                        if (active) {
-                            OnlineStatus(
-                                online = true,
-                                lastOnline = null
-                            )
-
+                            } else {
+                                Log.e(TAG, "online status $active")
+                                launch {
+                                    doc.update(
+                                        mapOf(
+                                            "online" to false,
+                                            "lastOnline" to System.currentTimeMillis()
+                                        )
+                                    )
+                                }
+                            }
                         } else {
 
-                            OnlineStatus(
-                                online = false,
-                                lastOnline = System.currentTimeMillis()
-                            )
+                            val status: OnlineStatus =
+                                if (active) {
+                                    OnlineStatus(
+                                        online = true,
+                                        lastOnline = null
+                                    )
 
+                                } else {
+
+                                    OnlineStatus(
+                                        online = false,
+                                        lastOnline = System.currentTimeMillis()
+                                    )
+
+                                }
+
+                            launch { doc.set(status).await() }
                         }
 
-                    doc.set(status).await()
+                    }
+
                 }
+
 
             }
 
         }
 
-    }
+
 
 
     private suspend fun addUserToFirestore(user: User) {

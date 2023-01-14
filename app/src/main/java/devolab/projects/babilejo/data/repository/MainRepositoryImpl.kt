@@ -326,14 +326,14 @@ class MainRepositoryImpl @Inject constructor(
 
         }
 
-    override suspend fun likePost(postId: String,user:User?): Resource<Void> {
+    override suspend fun likePost(postId: String, user: User?): Resource<Void> {
         return suspendCancellableCoroutine { cont ->
             user?.let {
 
 
                 firestore.collection("posts_global").document(postId)
                     .update("likes", FieldValue.arrayUnion(user)).addOnCompleteListener {
-                        if(it.isSuccessful) {
+                        if (it.isSuccessful) {
                             cont.resume(Resource.Success(it.result))
                         }
                         it.exception?.let {
@@ -346,6 +346,39 @@ class MainRepositoryImpl @Inject constructor(
 
         }
     }
+
+    override suspend fun getUserPosts(uid: String?): Resource<List<Post>> =
+        suspendCancellableCoroutine { cont ->
+
+
+            currentUser?.uid.let { currentUid ->
+
+                val query = uid?.let { postsCollection.whereEqualTo("currentUid", uid) }
+                    ?: postsCollection.whereEqualTo("currentUid", currentUid)
+
+                query
+                    .addSnapshotListener { value, error ->
+
+                        value?.let {
+
+                            val objects = it.toObjects<Post>()
+
+                            cont.resume(Resource.Success(objects))
+                        }
+
+                        error?.let {
+                            it.printStackTrace()
+                            it.message?.let { e ->
+                                cont.resume(Resource.Error(e))
+
+                            }
+                        }
+
+                    }
+
+            }
+
+        }
 
 
 }
